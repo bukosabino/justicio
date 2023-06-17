@@ -21,7 +21,7 @@ of Spain: Boletín Oficial del Estado (BOE).
 
 ## Components
 
-#### Backend service
+### Backend service
 
 It is the web service, and it is a central component for all the system doing most of the tasks:
 
@@ -31,7 +31,7 @@ It is the web service, and it is a central component for all the system doing mo
 * Save traces.
 * Handle input/output exceptions.
 
-#### Embedding database
+### Embedding database
 
 It has all documents on the BOE splited in small text chunks (1500 characters for example). 
 Each text chunk is transformed on an embedding (a numerical dense vector of 768 sizes for 
@@ -46,7 +46,7 @@ Options:
 
 The BOE is updated every day, so, we need to run an ETL job daily, getting the new documents, transforming to embeddings and saving on the Embedding database.
 
-#### LLM API Model
+### LLM API Model
 
 In progress.
 

@@ -4,11 +4,12 @@ Question/Answering Assistant that generates answers from user questions about th
 of Spain: Boletín Oficial del Estado (BOE).
 
 [Spanish link](https://www.boe.es)
+
 [English link](https://www.boe.es/index.php?lang=en)
 
 # How it works under the hood
 
-*image*
+<img width="905" alt="Captura de pantalla 2023-06-17 a las 21 05 26" src="https://github.com/bukosabino/ia-boe/assets/4375209/7b58e48e-bdad-47dc-bbdf-0dc80730f482">
 
 ## Flow
 

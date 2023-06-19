@@ -1,0 +1,9 @@
+# CharacterTextSplitter
+separator: "\n"
+chunk_size: 1800
+chunk_overlap: 100
+
+embeddings_model_name: dariolopez/roberta-base-bne-finetuned-msmarco-qa-es-mnrl-mn
+vector_store_index_name: boe-2022-09-07-test
+
+start_date: 2023/01/01

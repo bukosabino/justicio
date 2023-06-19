@@ -1,11 +1,15 @@
 # IA BOE
 
-Question/Answering Assistant that generates answers from user questions about the Official State Gazette 
-of Spain: Boletín Oficial del Estado (BOE).
+Question/Answering Assistant that generates answers from user questions about the Official State Gazette of Spain: 
+Boletín Oficial del Estado (BOE).
 
 [Spanish link](https://www.boe.es)
 
 [English link](https://www.boe.es/index.php?lang=en)
+
+TL;DR: All BOE articles are embedded in vectors and stored in a vector database. When a question is asked, the question 
+is embedded in the same latent space and the most relevant text is retrieved from the vector database by performing a 
+query using the embedded question. The retrieved pieces of text are then sent to the LLM to construct an answer.
 
 # How it works under the hood
 
@@ -13,6 +17,7 @@ of Spain: Boletín Oficial del Estado (BOE).
 
 ## Flow
 
+0. All BOE articles are embedded in vectors and stored in a vector database. This process is run at startup and every day.
 1. The user writes (using natural language) any question related to the BOE as input to the system.
 2. The backend service handles the input request (user question), transforms the question into an embedding, and sends the generated embedding as a query to the embedding database.
 3. The embedding database returns documents most similar to the query.
@@ -32,28 +37,59 @@ It is the web service, and it is a central component for all the system doing mo
 * Save traces.
 * Handle input/output exceptions.
 
-### Embedding database
+### Embedding/Vector database
 
-It has all documents on the BOE splited in small text chunks (1500 characters for example). 
-Each text chunk is transformed on an embedding (a numerical dense vector of 768 sizes for 
-example).
+#### Loading data
 
-It implements endpoints to get semantic search or keyword search.
+It has all the documents on the BOE broken down into small chunks of text (for example, 2000 characters). Each text 
+chunk is transformed into an embedding (a numerically dense vector of 768 sizes, for example). Also, some additional 
+metadata is stored along with the vectors, so we can pre-filter or post-filter the search results.
 
-Options:
-* Pinecone (memory)
-* Supabase (hard disk)
-* Pgvector (hard disk)
+The BOE is updated every day, so we need to run an ETL job every day to retrieve the new documents, transform them 
+into embeddings, link the metadata, and store them in the embedding database.
 
-The BOE is updated every day, so, we need to run an ETL job daily, getting the new documents, transforming to embeddings and saving on the Embedding database.
+#### Reading data
+
+It implements APIs to transform the input question into a vector, and to perform ANN (Appproximate Nearest Neighbour) 
+against all the vectors in the database.
+
+There are different types of search (semantic search, keyword search, or hybrid search).
+
+There are different types of ANNs (cosine similarity, Euclidean distance, or dot product).
+
+#### Embedding Model
+
+The text in BOE is written in Spanish, so we need a sentence transformer model that is fine-tuned using Spanish 
+datasets. We are experimenting with this: https://github.com/bukosabino/sbert-spanish
+
+More info: https://www.newsletter.swirlai.com/p/sai-notes-07-what-is-a-vector-database
 
 ### LLM API Model
 
-In progress.
+It is a Large Language Model (LLM) which generates answers to questions 
 
 Options:
 * OpenAI
 * Falcon
+
+# How to work
+
+export PINECONE_API_KEY=<your_pinecone_api_key>
+export PINECONE_ENV=<your_pinecone_env>
+export OPENAI_API_KEY=<your_open_api_key>
+./bin/build
+
+## Init ETL
+
+./bin/run_etl_initial
+
+## Daily ETL
+
+./bin/run_etl_daily
+
+## Run service
+
+./bin/run_service
 
 # Structure of the repo
 

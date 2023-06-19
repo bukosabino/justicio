@@ -9,7 +9,7 @@ of Spain: Boletín Oficial del Estado (BOE).
 
 # How it works under the hood
 
-<img width="905" alt="Captura de pantalla 2023-06-17 a las 21 05 26" src="https://github.com/bukosabino/ia-boe/assets/4375209/7b58e48e-bdad-47dc-bbdf-0dc80730f482">
+<img width="1594" alt="Captura de pantalla 2023-06-19 a las 18 37 41" src="https://github.com/bukosabino/ia-boe/assets/4375209/7266699b-8ad6-4a1c-8b6c-fe05c837af3a">
 
 ## Flow
 

@@ -8,6 +8,9 @@ from langchain.vectorstores.pinecone import Pinecone
 from langchain.embeddings import HuggingFaceEmbeddings
 
 
+# TODO: duplicated code
+
+
 def setup_logging():
     logger = lg.getLogger()
     logger.info('Starting initialization of application')
@@ -20,7 +23,6 @@ def setup_logging():
     logger.addHandler(handler)
     logger.setLevel(lg.INFO)
     logger.info('Logging set up')
-    lg.getLogger('uvicorn.error').handlers = logger.handlers
 
 
 def initialize():

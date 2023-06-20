@@ -1,19 +1,6 @@
-FROM python:3.11-slim-buster
+FROM python:3.11-slim
 
-RUN apt-get update && apt-get install -y \
-    curl \
-    libssl-dev \
-    unzip \
-    htop \
-    jq \
-    lynx \
-    p7zip-full \
-    procps \
-    screen \
-    vim \
- && rm -rf /var/lib/apt/lists/* \
-
-# RUN pip install --upgrade pip
+RUN pip install --upgrade pip
 
 WORKDIR /usr/app
 
@@ -26,4 +13,4 @@ COPY . .
 ENV APP_PATH="/usr/app"
 ENV PYTHONPATH "${PYTHONPATH}:${APP_PATH}"
 
-CMD ["python", "src/etls/etl_initial.py"]
+CMD ["uvicorn", "src.service.app:APP", "--host", "0.0.0.0", "--port", "5000", "--workers", "2", "--timeout-keep-alive", "125", "--log-level", "info"]

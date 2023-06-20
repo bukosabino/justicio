@@ -1,3 +1,4 @@
+import logging as lg
 import typing as tp
 import tempfile
 from datetime import date, timedelta
@@ -8,12 +9,10 @@ import requests
 from requests.exceptions import HTTPError
 
 from utils import BOEMetadataDocument
+from initialize import setup_logging
 
-import logging
 
-logging.basicConfig()
-logging.getLogger().setLevel(logging.INFO)
-logger = logging.getLogger('boelogger')
+setup_logging()
 
 
 def download_boe_days(date_start: date, date_end: date):
@@ -23,6 +22,7 @@ def download_boe_days(date_start: date, date_end: date):
     :param date_end:
     :return:
     """
+    logger = lg.getLogger(download_boe_days.__name__)
     logger.info("Downloading BOE content from day %s to %s", date_start, date_end)
     delta = timedelta(days=1)
     metadata_documents = []
@@ -40,6 +40,7 @@ def download_boe_day(day: date) -> tp.List[BOEMetadataDocument]:
     :param day:
     :return:
     """
+    logger = lg.getLogger(download_boe_day.__name__)
     logger.info("Downloading BOE content for day %s", day)
     day_str = day.strftime("%Y/%m/%d")
     day_url = f"https://www.boe.es/boe/dias/{day_str}"
@@ -69,8 +70,9 @@ def download_boe_document(url: str) -> BOEMetadataDocument:
     :param url: document url link. Example: https://www.boe.es/diario_boe/txt.php?id=BOE-A-2022-14630
     :return: document with text content
     """
+    logger = lg.getLogger(download_boe_document.__name__)
     logger.info("Scrapping document: %s", url)
-    response = requests.get(url, headers={'User-agent': 'your bot 0.1'}, verify=False)  # TODO: remove verify
+    response = requests.get(url)
     response.raise_for_status()
     with tempfile.NamedTemporaryFile('w', delete=False) as fn:
         soup = BeautifulSoup(response.text, 'html.parser')  # 'html5lib'
@@ -98,8 +100,9 @@ def _list_links_day(url: str) -> tp.List[str]:
     :param url: day url link. Example: https://www.boe.es/boe/dias/2022/09/07/
     :return: list of id documents to explore (links)
     """
+    logger = lg.getLogger(_list_links_day.__name__)
     logger.info("Scrapping day: %s", url)
-    response = requests.get(url, headers={'User-agent': 'your bot 0.1'}, verify=False)  # TODO: remove verify
+    response = requests.get(url)
     response.raise_for_status()
     soup = BeautifulSoup(response.text, 'html.parser')
     id_links = [

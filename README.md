@@ -7,7 +7,7 @@ Boletín Oficial del Estado (BOE).
 
 [English link](https://www.boe.es/index.php?lang=en)
 
-TL;DR: All BOE articles are embedded in vectors and stored in a vector database. When a question is asked, the question 
+**TL;DR:** All BOE articles are embedded in vectors and stored in a vector database. When a question is asked, the question 
 is embedded in the same latent space and the most relevant text is retrieved from the vector database by performing a 
 query using the embedded question. The retrieved pieces of text are then sent to the LLM to construct an answer.
 
@@ -74,22 +74,29 @@ Options:
 
 # How to work
 
+```
 export PINECONE_API_KEY=<your_pinecone_api_key>
 export PINECONE_ENV=<your_pinecone_env>
 export OPENAI_API_KEY=<your_open_api_key>
-./bin/build
+```
 
 ## Init ETL
 
-./bin/run_etl_initial
+```
+python src/etls/etl_initial.py
+```
 
 ## Daily ETL
 
-./bin/run_etl_daily
+```
+python src/etls/etl_daily.py
+```
 
 ## Run service
 
-./bin/run_service
+```
+uvicorn src.service.app:APP --host=0.0.0.0 --port=5001 --workers=2 --timeout-keep-alive=125 --log-level=error
+```
 
 # Structure of the repo
 
@@ -100,6 +107,6 @@ In progress.
 * Summarize ELI5
 * From QA to chat conversation (using memory)
 * Add other regional and/or provincial gazettes https://www.boe.es/legislacion/otros_diarios_oficiales.php
-* Create a OpenAI plugin
 * Generate smart questions from an article
 * Use OpenAI Moderation API to filter wrong behaviours from users: https://platform.openai.com/docs/guides/moderation
+* Create an OpenAI plugin

@@ -1,13 +1,13 @@
-from datetime import datetime, date
-import logging
+import logging as lg
 
-from utils import BOEMetadataDocument, BOETextLoader
 from langchain.text_splitter import CharacterTextSplitter
 import pinecone
 
-logging.basicConfig()
-logging.getLogger().setLevel(logging.INFO)
-logger = logging.getLogger('boelogger')
+from utils import BOEMetadataDocument, BOETextLoader
+from initialize import setup_logging
+
+
+setup_logging()
 
 
 class ETL:
@@ -15,10 +15,6 @@ class ETL:
         self._config_loader = config_loader
         self._vector_store = vector_store
 
-        self.start_date = datetime.strptime(self._config_loader['start_date'], '%Y/%m/%d')
-        self.end_date = date.today()
-
-    # @timeit
     def run(self, docs):
         chunks = self._split_documents(docs)
         self._load_database(chunks)
@@ -30,6 +26,7 @@ class ETL:
         :param docs:
         :return:
         """
+        logger = lg.getLogger(self._split_documents.__name__)
         logger.info("Splitting in chunks %s documents", len(docs))
         docs_chunks = []
         for doc in docs:
@@ -45,12 +42,14 @@ class ETL:
         return docs_chunks
 
     def _load_database(self, docs_chunks):
+        logger = lg.getLogger(self._load_database.__name__)
         logger.info("Loading %s embeddings to database", len(docs_chunks))
         self._vector_store.add_documents(docs_chunks)
         logger.info("Loaded %s embeddings to database", len(docs_chunks))
 
     def _log_database_stats(self):
+        logger = lg.getLogger(self._log_database_stats.__name__)
         index_name = self._config_loader['vector_store_index_name']
-        index = pinecone.Index(index_name)
         logger.info(pinecone.describe_index(index_name))
+        index = pinecone.Index(index_name)
         logger.info(index.describe_index_stats())

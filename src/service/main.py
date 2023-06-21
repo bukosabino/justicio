@@ -8,7 +8,7 @@ from src.initialize import initialize, setup_logging
 
 setup_logging()
 
-APP = FastAPI()
+app = FastAPI()
 
 INIT_OBJECTS = initialize()
 
@@ -18,14 +18,21 @@ DEFAULT_INPUT_QUERY = (
 )
 
 
-@APP.get("/healthcheck")
+@app.get("/healthz")
+@timeit
+async def healthz():
+    """Asynchronous Health Check"""
+    return {"status": "OK"}
+
+
+@app.get("/healthcheck")
 @timeit
 async def healthcheck():
     """Asynchronous Health Check"""
     return {"status": "OK"}
 
 
-@APP.get("/semantic_search")
+@app.get("/semantic_search")
 @timeit
 async def semantic_search(input_query: str = DEFAULT_INPUT_QUERY):
     logger = lg.getLogger(semantic_search.__name__)
@@ -38,7 +45,7 @@ async def semantic_search(input_query: str = DEFAULT_INPUT_QUERY):
     return docs
 
 
-@APP.get("/qa")
+@app.get("/qa")
 @timeit
 async def qa(input_query: str = DEFAULT_INPUT_QUERY):
     return {"message": "not developed yet"}

@@ -100,7 +100,7 @@ python src/etls/etl_daily.py
 ## Run service
 
 ```
-uvicorn src.service.app:APP --host=0.0.0.0 --port=5001 --workers=2 --timeout-keep-alive=125 --log-level=error
+uvicorn src.service.main:APP --host=0.0.0.0 --port=5001 --workers=1 --timeout-keep-alive=125 --log-level=info
 ```
 
 # Structure of the repo

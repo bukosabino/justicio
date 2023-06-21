@@ -80,6 +80,11 @@ export PINECONE_ENV=<your_pinecone_env>
 export OPENAI_API_KEY=<your_open_api_key>
 ```
 
+```
+export APP_PATH="."
+pip install -r requirements.txt
+```
+
 ## Init ETL
 
 ```

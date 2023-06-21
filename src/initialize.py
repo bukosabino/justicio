@@ -10,7 +10,7 @@ from langchain.embeddings import HuggingFaceEmbeddings
 
 def setup_logging():
     logger = lg.getLogger()
-    logger.info('Starting initialization of application')
+    logger.info('Initializing logging')
     logger.handlers = []
     handler = lg.StreamHandler()
     formatter = (
@@ -19,7 +19,7 @@ def setup_logging():
     handler.setFormatter(formatter)
     logger.addHandler(handler)
     logger.setLevel(lg.INFO)
-    logger.info('Logging set up')
+    logger.info('Initialized logging')
     lg.getLogger('uvicorn.error').handlers = logger.handlers
 
 
@@ -27,10 +27,10 @@ def initialize():
     """Initializes the application
     """
     logger = lg.getLogger(initialize.__name__)
-    logger.info('Starting initialization of application')
+    logger.info('Initializing application')
     config_loader = _config_parser_setup()
     vector_store = _vector_store_setup(config_loader)
-    logger.info('Finished initialization of application')
+    logger.info('Initialized application')
     init_objects = collections.namedtuple('init_objects', ['config_loader', 'vector_store'])
     return init_objects(config_loader, vector_store)
 

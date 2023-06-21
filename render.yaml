@@ -1,3 +1,4 @@
+previewsEnabled: true
 services:
   # A Docker web service
   - type: web
@@ -6,4 +7,4 @@ services:
     plan: free
     autoDeploy: false
     buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn src.service.main:APP --host 0.0.0.0 --port $PORT --workers 2 --timeout-keep-alive 125 --log-level error
+    startCommand: uvicorn src.service.main:app --host 0.0.0.0 --port 10000 --workers 1 --timeout-keep-alive 125 --log-level info

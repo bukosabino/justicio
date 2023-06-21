@@ -6,6 +6,8 @@ import yaml
 import pinecone
 from langchain.vectorstores.pinecone import Pinecone
 from langchain.embeddings import HuggingFaceEmbeddings
+from langchain.chains import RetrievalQA
+from langchain.chat_models import ChatOpenAI
 
 
 def setup_logging():
@@ -28,22 +30,23 @@ def initialize():
     """
     logger = lg.getLogger(initialize.__name__)
     logger.info('Initializing application')
-    config_loader = _config_parser_setup()
-    vector_store = _vector_store_setup(config_loader)
+    config_loader = _init_config()
+    vector_store = _init_vector_store(config_loader)
+    retrieval_qa = _init_retrieval_qa_llm(vector_store)
     logger.info('Initialized application')
-    init_objects = collections.namedtuple('init_objects', ['config_loader', 'vector_store'])
-    return init_objects(config_loader, vector_store)
+    init_objects = collections.namedtuple('init_objects', ['config_loader', 'vector_store', 'retrieval_qa'])
+    return init_objects(config_loader, vector_store, retrieval_qa)
 
 
-def _config_parser_setup():
+def _init_config():
     yaml_config_path = os.path.join(os.environ['APP_PATH'], 'config', 'config.yaml')
     with open(yaml_config_path, "r") as stream:
         config_loader = yaml.safe_load(stream)
     return config_loader
 
 
-def _vector_store_setup(config_loader):
-    logger = lg.getLogger(_vector_store_setup.__name__)
+def _init_vector_store(config_loader):
+    logger = lg.getLogger(_init_vector_store.__name__)
     logger.info("Initializing vector store")
     pinecone.init(
         api_key=os.environ['PINECONE_API_KEY'],
@@ -59,3 +62,16 @@ def _vector_store_setup(config_loader):
     logger.info(index.describe_index_stats())
     logger.info("Initialized vector store")
     return vector_store
+
+
+def _init_retrieval_qa_llm(vector_store):
+    logger = lg.getLogger(_init_retrieval_qa_llm.__name__)
+    logger.info("Initializing RetrievalQA LLM")
+    retriever = vector_store.as_retriever()
+    retrieval_qa = RetrievalQA.from_chain_type(
+        llm=ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0),
+        chain_type="stuff",
+        retriever=retriever,
+    )
+    logger.info("Initialized RetrievalQA LLM")
+    return retrieval_qa

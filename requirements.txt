@@ -9,3 +9,4 @@ beautifulsoup4==4.12.2
 langchain==0.0.202
 pinecone-client==2.2.2
 sentence_transformers==2.2.2
+openai==0.27.8

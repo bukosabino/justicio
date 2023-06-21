@@ -1,4 +1,5 @@
 import logging as lg
+import uuid
 
 from fastapi import FastAPI
 
@@ -8,7 +9,7 @@ from src.initialize import initialize, setup_logging
 
 setup_logging()
 
-app = FastAPI()
+APP = FastAPI()
 
 INIT_OBJECTS = initialize()
 
@@ -18,21 +19,14 @@ DEFAULT_INPUT_QUERY = (
 )
 
 
-@app.get("/healthz")
-@timeit
-async def healthz():
-    """Asynchronous Health Check"""
-    return {"status": "OK"}
-
-
-@app.get("/healthcheck")
+@APP.get("/healthcheck")
 @timeit
 async def healthcheck():
     """Asynchronous Health Check"""
     return {"status": "OK"}
 
 
-@app.get("/semantic_search")
+@APP.get("/semantic_search")
 @timeit
 async def semantic_search(input_query: str = DEFAULT_INPUT_QUERY):
     logger = lg.getLogger(semantic_search.__name__)
@@ -45,7 +39,20 @@ async def semantic_search(input_query: str = DEFAULT_INPUT_QUERY):
     return docs
 
 
-@app.get("/qa")
+@APP.get("/qa")
 @timeit
 async def qa(input_query: str = DEFAULT_INPUT_QUERY):
-    return {"message": "not developed yet"}
+    logger = lg.getLogger(qa.__name__)
+    logger.info(input_query)
+    response_payload = {
+        'scoring_id': str(uuid.uuid4())
+    }
+    docs = INIT_OBJECTS.vector_store.similarity_search_with_score(
+        query=input_query,
+        k=INIT_OBJECTS.config_loader['top_k_results']
+    )
+    answer = INIT_OBJECTS.retrieval_qa.run(input_query)
+    response_payload['context'] = docs
+    response_payload['answer'] = answer
+    logger.info(response_payload)
+    return response_payload

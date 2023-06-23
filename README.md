@@ -60,17 +60,17 @@ There are different types of ANNs (cosine similarity, Euclidean distance, or dot
 #### Embedding Model
 
 The text in BOE is written in Spanish, so we need a sentence transformer model that is fine-tuned using Spanish 
-datasets. We are experimenting with this: https://github.com/bukosabino/sbert-spanish
+datasets. We are experimenting with [these models](https://github.com/bukosabino/sbert-spanish).
 
 More info: https://www.newsletter.swirlai.com/p/sai-notes-07-what-is-a-vector-database
 
 ### LLM API Model
 
-It is a Large Language Model (LLM) which generates answers to questions 
+It is a Large Language Model (LLM) which generates answers for questions.
 
 Options:
-* OpenAI
-* Falcon
+* OpenAI (Third party API)
+* Falcon (Own API)
 
 # How to work
 
@@ -86,6 +86,8 @@ pip install -r requirements.txt
 ```
 
 ## Init ETL
+
+Fill your vector database.
 
 ```
 python src/etls/etl_initial.py
@@ -115,3 +117,10 @@ In progress.
 * Generate smart questions from an article
 * Use OpenAI Moderation API to filter wrong behaviours from users: https://platform.openai.com/docs/guides/moderation
 * Create an OpenAI plugin
+
+# Want to help develop the project?
+
+You are welcome! Please, contact us to see how you can help.
+
+* @bukosabino
+* @adantart

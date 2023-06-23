@@ -10,7 +10,7 @@ from langchain.chains import RetrievalQA
 from langchain.chat_models import ChatOpenAI
 
 
-def setup_logging():
+def initialize_logging():
     logger = lg.getLogger()
     logger.info('Initializing logging')
     logger.handlers = []
@@ -25,10 +25,10 @@ def setup_logging():
     lg.getLogger('uvicorn.error').handlers = logger.handlers
 
 
-def initialize():
+def initialize_app():
     """Initializes the application
     """
-    logger = lg.getLogger(initialize.__name__)
+    logger = lg.getLogger(initialize_app.__name__)
     logger.info('Initializing application')
     config_loader = _init_config()
     vector_store = _init_vector_store(config_loader)

@@ -19,39 +19,36 @@ query using the embedded question. The retrieved pieces of text are then sent to
 
 0. All BOE articles are embedded in vectors and stored in a vector database. This process is run at startup and every day.
 1. The user writes (using natural language) any question related to the BOE as input to the system.
-2. The backend service handles the input request (user question), transforms the question into an embedding, and sends the generated embedding as a query to the embedding database.
-3. The embedding database returns documents most similar to the query.
-4. The most similar documents returned by the embedding database are added as context to the input request. Then it sends a request to the LLM API model with all the information.
+2. The backend service processes the input request (user question), transforms the question into an embedding, and sends the generated embedding as a query to the embedding database.
+3. The embedding database returns documents that most closely match the query.
+4. The most similar documents returned by the embedding database are added as context to the input request. Then it sends a request with all the information to the LLM API model.
 5. The LLM API model returns a natural language answer to the user's question. 
-6. The user gets an AI generated response output.
+6. The user receives an AI-generated response output.
 
 ## Components
 
 ### Backend service
 
-It is the web service, and it is a central component for all the system doing most of the tasks:
+It is the web service, and it is a central component for the whole system, doing most of the tasks:
 
-* Handle the input requests from the user.
-* Transform the input text to embeddings.
-* Send requests to Embeddings database and LLM API Model.
-* Save traces.
+* Process the input requests from the user.
+* Transform the input text into embeddings.
+* Send requests to the embeddings database to get the most similar embeddings.
+* Send requests to the LLM API model to generate the response.
+* Save the traces.
 * Handle input/output exceptions.
 
 ### Embedding/Vector database
 
 #### Loading data
 
-It has all the documents on the BOE broken down into small chunks of text (for example, 2000 characters). Each text 
-chunk is transformed into an embedding (a numerically dense vector of 768 sizes, for example). Also, some additional 
-metadata is stored along with the vectors, so we can pre-filter or post-filter the search results.
+We download the BOE documents and break them into small chunks of text (e.g. 2000 characters). Each text chunk is transformed into an embedding (e.g. a numerically dense vector of 768 sizes). Some additional metadata is also stored with the vectors so that we can pre- or post-filter the search results. [Check the code](https://github.com/bukosabino/ia-boe/blob/main/src/etls/etl_initial.py)
 
-The BOE is updated every day, so we need to run an ETL job every day to retrieve the new documents, transform them 
-into embeddings, link the metadata, and store them in the embedding database.
+The BOE is updated every day, so we need to run an ETL job every day to retrieve the new documents, transform them into embeddings, link the metadata, and store them in the embedding database. [Check the code](https://github.com/bukosabino/ia-boe/blob/main/src/etls/etl_daily.py)
 
 #### Reading data
 
-It implements APIs to transform the input question into a vector, and to perform ANN (Appproximate Nearest Neighbour) 
-against all the vectors in the database.
+It implements APIs to transform the input question into a vector, and to perform ANN (Approximate Nearest Neighbour) against all the vectors in the database. [Check the code](https://github.com/bukosabino/ia-boe/blob/main/src/service/main.py)
 
 There are different types of search (semantic search, keyword search, or hybrid search).
 
@@ -72,42 +69,9 @@ Options:
 * OpenAI (Third party API)
 * Falcon (Own API)
 
-# How to work
+# Deploy your own service
 
-```
-export PINECONE_API_KEY=<your_pinecone_api_key>
-export PINECONE_ENV=<your_pinecone_env>
-export OPENAI_API_KEY=<your_open_api_key>
-```
-
-```
-export APP_PATH="."
-pip install -r requirements.txt
-```
-
-## Init ETL
-
-Fill your vector database.
-
-```
-python src/etls/etl_initial.py
-```
-
-## Daily ETL
-
-```
-python src/etls/etl_daily.py
-```
-
-## Run service
-
-```
-uvicorn src.service.main:APP --host=0.0.0.0 --port=5001 --workers=1 --timeout-keep-alive=125 --log-level=info
-```
-
-# Structure of the repo
-
-In progress.
+Check `deployment_guide.md` file
 
 # Future features
 

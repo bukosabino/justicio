@@ -4,14 +4,14 @@ import uuid
 from fastapi import FastAPI
 
 from src.utils import timeit
-from src.initialize import initialize, setup_logging
+from src.initialize import initialize_app, initialize_logging
 
 
-setup_logging()
+initialize_logging()
 
 APP = FastAPI()
 
-INIT_OBJECTS = initialize()
+INIT_OBJECTS = initialize_app()
 
 DEFAULT_INPUT_QUERY = (
     "Según la Ley Orgánica 10/2022: ¿Es de aplicación esta ley a niños (varones) menores de edad víctimas de "

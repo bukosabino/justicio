@@ -22,13 +22,13 @@ export APP_PATH="."
 Load BOE documents into your vector database (depending on the selected data, may take a few minutes)
 
 ```
-python src/etls/etl_initial.py
+python -m src.etls.etl_initial
 ```
 
 If you want to update the vector database on a daily basis (BOE publishes new documents every day), run this file as a scheduled job (e.g. with CRON).
 
 ```
-python src/etls/etl_daily.py
+python -m src.etls.etl_daily
 ```
 
 ## 2. Deploy the service
@@ -59,7 +59,7 @@ export APP_PATH="."
 Run the service
 
 ```
-uvicorn src.service.main:APP --host=0.0.0.0 --port=5001 --workers=1 --timeout-keep-alive=125 --log-level=info > output.out 2>&1 &
+nohup uvicorn src.service.main:APP --host=0.0.0.0 --port=5001 --workers=1 --timeout-keep-alive=125 --log-level=info > output.out 2>&1 &
 ```
 
 In the browser

@@ -2,6 +2,15 @@ from functools import wraps
 import logging as lg
 import time
 
+from pydantic import BaseModel
+from langchain.schema import Document
+
+
+class QAResponsePayloadModel(BaseModel):
+    scoring_id: str
+    context: Document
+    answer: str
+
 
 def timeit(func):
 

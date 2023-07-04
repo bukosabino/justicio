@@ -2,12 +2,14 @@ from dataclasses import dataclass
 from datetime import datetime, date
 import typing as tp
 
+from pydantic import BaseModel, validator
 from langchain.docstore.document import Document
 from langchain.document_loaders.base import BaseLoader
 
 
 @dataclass
-class BOEMetadataDocument:
+class BOEMetadataDocument2:
+    # NOTE: deprecated
     """Class for keeping metadata of a BOE Document scrapped."""
     filepath: str
     title: str
@@ -25,6 +27,56 @@ class BOEMetadataDocument:
             'datetime_insert': self.datetime_insert
         }
         return metadata_dict
+
+
+class BOEMetadataReferencia(BaseModel):
+    id: str
+    palabra: str
+    texto: str
+
+
+class BOEMetadataDocument(BaseModel):
+    """Class for keeping metadata of a BOE Document scrapped."""
+    # Text
+    filepath: str
+
+    # Metadatos
+    identificador: str
+    numero_oficial: str = ''
+    departamento: str
+    rango: str = ''
+    titulo: str
+    url_pdf: str
+    origen_legislativo: str = ''
+    fecha_publicacion: str
+    fecha_disposicion: str = ''
+
+    # Analisis
+    observaciones: str = ''
+    ambito_geografico: str = ''
+    modalidad: str = ''
+    tipo: str = ''
+    materias: tp.List[str]
+    alertas: tp.List[str]
+    notas: tp.List[str]
+    ref_posteriores: tp.List[BOEMetadataReferencia]
+    ref_anteriores: tp.List[BOEMetadataReferencia]
+
+    datetime_insert: str = datetime.utcnow().isoformat()
+
+    @validator("ref_posteriores")
+    def ref_posteriores_to_json(cls, validators):
+        return [v.json() for v in validators]
+
+    @validator("ref_anteriores")
+    def ref_anteriores_to_json(cls, validators):
+        return [v.json() for v in validators]
+
+    @validator("fecha_publicacion", "fecha_disposicion")
+    def isoformat(cls, v):
+        if v:
+            return datetime.strptime(v, '%Y%m%d').strftime('%Y-%m-%d')
+        return v
 
 
 class BOETextLoader(BaseLoader):

@@ -1,13 +1,17 @@
 import logging as lg
+import os
+import typing as tp
 
 from langchain.text_splitter import CharacterTextSplitter
+from langchain.schema import Document
 import pinecone
+from retry import retry
 
-from utils import BOEMetadataDocument, BOETextLoader
-from initialize import setup_logging
+from src.etls.utils import BOETextLoader, BOEMetadataDocument
+from src.initialize import initialize_logging
 
 
-setup_logging()
+initialize_logging()
 
 
 class ETL:
@@ -15,12 +19,12 @@ class ETL:
         self._config_loader = config_loader
         self._vector_store = vector_store
 
-    def run(self, docs):
+    def run(self, docs: tp.List[BOEMetadataDocument]):
         chunks = self._split_documents(docs)
         self._load_database(chunks)
         self._log_database_stats()
 
-    def _split_documents(self, docs):
+    def _split_documents(self, docs: tp.List[BOEMetadataDocument]) -> tp.List[Document]:
         """Split documents by chunks
 
         :param docs:
@@ -30,7 +34,7 @@ class ETL:
         logger.info("Splitting in chunks %s documents", len(docs))
         docs_chunks = []
         for doc in docs:
-            loader = BOETextLoader(file_path=doc.filepath, metadata=doc.load_metadata())
+            loader = BOETextLoader(file_path=doc.filepath, metadata=doc.dict())
             documents = loader.load()
             text_splitter = CharacterTextSplitter(
                 separator=self._config_loader['separator'],
@@ -38,16 +42,19 @@ class ETL:
                 chunk_overlap=self._config_loader['chunk_overlap']
             )
             docs_chunks += text_splitter.split_documents(documents)
+        logger.info('Removing file %s', doc.filepath)
+        os.remove(doc.filepath)
         logger.info("Splitted %s documents in %s chunks", len(docs), len(docs_chunks))
         return docs_chunks
 
-    def _load_database(self, docs_chunks):
+    @retry(tries=3, delay=2)
+    def _load_database(self, docs_chunks: tp.List[Document]) -> None:
         logger = lg.getLogger(self._load_database.__name__)
         logger.info("Loading %s embeddings to database", len(docs_chunks))
         self._vector_store.add_documents(docs_chunks)
         logger.info("Loaded %s embeddings to database", len(docs_chunks))
 
-    def _log_database_stats(self):
+    def _log_database_stats(self) -> None:
         logger = lg.getLogger(self._log_database_stats.__name__)
         index_name = self._config_loader['vector_store_index_name']
         logger.info(pinecone.describe_index(index_name))

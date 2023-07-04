@@ -3,7 +3,7 @@ import uuid
 
 from fastapi import FastAPI
 
-from src.utils import timeit
+from src.utils import QAResponsePayloadModel, timeit
 from src.initialize import initialize_app, initialize_logging
 
 
@@ -23,6 +23,7 @@ DEFAULT_INPUT_QUERY = (
 @timeit
 async def healthcheck():
     """Asynchronous Health Check"""
+    # TODO: healthcheck with pinecone and openai
     return {"status": "OK"}
 
 
@@ -39,7 +40,7 @@ async def semantic_search(input_query: str = DEFAULT_INPUT_QUERY):
     return docs
 
 
-@APP.get("/qa")
+@APP.get("/qa", response_model=QAResponsePayloadModel)
 @timeit
 async def qa(input_query: str = DEFAULT_INPUT_QUERY):
     logger = lg.getLogger(qa.__name__)

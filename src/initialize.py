@@ -73,7 +73,5 @@ def _init_retrieval_qa_llm(vector_store):
         chain_type="stuff",
         retriever=retriever,
     )
-    logger.info(type(retrieval_qa.combine_documents_chain.llm_chain.prompt))
-    logger.info(retrieval_qa.combine_documents_chain.llm_chain.prompt)
     logger.info("Initialized RetrievalQA LLM")
     return retrieval_qa

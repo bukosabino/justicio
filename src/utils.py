@@ -1,3 +1,4 @@
+import typing as tp
 from functools import wraps
 import logging as lg
 import time
@@ -8,7 +9,7 @@ from langchain.schema import Document
 
 class QAResponsePayloadModel(BaseModel):
     scoring_id: str
-    context: Document
+    context: tp.List[tp.Tuple[Document, float]]
     answer: str
 
 

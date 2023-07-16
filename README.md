@@ -63,7 +63,8 @@ More info: https://www.newsletter.swirlai.com/p/sai-notes-07-what-is-a-vector-da
 
 ### LLM API Model
 
-It is a Large Language Model (LLM) which generates answers for questions.
+It is a Large Language Model (LLM) which generates answers for the user questions based on the context, which is
+the most similar documents returned by the embedding database.
 
 Options:
 * OpenAI (Third party API)

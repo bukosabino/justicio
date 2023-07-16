@@ -45,6 +45,7 @@ Install the requirements:
 sudo apt install python3-virtualenv
 virtualenv -p python3 venv3.10
 source venv3.10/bin/activate
+pip install -r requirements.txt
 ```
 
 Export environment variables:
@@ -59,7 +60,7 @@ export APP_PATH="."
 Run the service
 
 ```
-nohup uvicorn src.service.main:APP --host=0.0.0.0 --port=5001 --workers=1 --timeout-keep-alive=125 --log-level=info > output.out 2>&1 &
+nohup uvicorn src.service.main:APP --host=0.0.0.0 --port=5001 --workers=2 --timeout-keep-alive=125 --log-level=info > output.out 2>&1 &
 ```
 
 In the browser

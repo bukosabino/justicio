@@ -4,6 +4,7 @@ import os
 import yaml
 
 import pinecone
+from langchain.prompts import ChatPromptTemplate, HumanMessagePromptTemplate, SystemMessagePromptTemplate
 from langchain.vectorstores.pinecone import Pinecone
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.chains import RetrievalQA
@@ -32,7 +33,7 @@ def initialize_app():
     logger.info('Initializing application')
     config_loader = _init_config()
     vector_store = _init_vector_store(config_loader)
-    retrieval_qa = _init_retrieval_qa_llm(vector_store)
+    retrieval_qa = _init_retrieval_qa_llm(vector_store, config_loader)
     logger.info('Initialized application')
     init_objects = collections.namedtuple('init_objects', ['config_loader', 'vector_store', 'retrieval_qa'])
     return init_objects(config_loader, vector_store, retrieval_qa)
@@ -64,14 +65,24 @@ def _init_vector_store(config_loader):
     return vector_store
 
 
-def _init_retrieval_qa_llm(vector_store):
+def _init_retrieval_qa_llm(vector_store, config_loader):
     logger = lg.getLogger(_init_retrieval_qa_llm.__name__)
     logger.info("Initializing RetrievalQA LLM")
     retriever = vector_store.as_retriever()
+    system_template = f"{config_loader['prompt_system']}----------------\n{{context}}"
+    messages = [
+        SystemMessagePromptTemplate.from_template(system_template),
+        HumanMessagePromptTemplate.from_template("{question}"),
+    ]
     retrieval_qa = RetrievalQA.from_chain_type(
-        llm=ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0),
+        llm=ChatOpenAI(model_name=config_loader['llm_model_name'], temperature=0),
         chain_type="stuff",
         retriever=retriever,
+        chain_type_kwargs={
+            "prompt": ChatPromptTemplate.from_messages(messages),
+            "verbose": True  # TODO: remove in production
+        },
     )
+    logger.info(retrieval_qa.combine_documents_chain.llm_chain.prompt.format)
     logger.info("Initialized RetrievalQA LLM")
     return retrieval_qa

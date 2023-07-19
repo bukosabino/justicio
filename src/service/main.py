@@ -27,6 +27,22 @@ async def healthcheck():
     return {"status": "OK"}
 
 
+DEFAULT_INPUT_QUERY2 = """
+En lo que se refiere a ciencia, i+d o comercio en Andalucia o Aragón, ¿qué Ley es la última 
+que habla de las multas de las subvenciones? Sólo dentro del BOE-A-2019-1414
+"""
+
+@APP.get("/query_filter")
+@timeit
+async def query_filter(input_query: str = DEFAULT_INPUT_QUERY2):
+    logger = lg.getLogger(query_filter.__name__)
+    logger.info(input_query)
+    filters = INIT_OBJECTS.self_query_retriever.get_filters(
+        query=input_query
+    )
+    return filters
+
+
 @APP.get("/semantic_search")
 @timeit
 async def semantic_search(input_query: str = DEFAULT_INPUT_QUERY):

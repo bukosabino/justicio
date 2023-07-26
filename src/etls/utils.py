@@ -50,6 +50,7 @@ class BOEMetadataDocument(BaseModel):
     origen_legislativo: str = ''
     fecha_publicacion: str
     fecha_disposicion: str = ''
+    anio: str
 
     # Analisis
     observaciones: str = ''

@@ -10,7 +10,9 @@ pydantic==1.10.10
 
 retry==0.9.2
 
-langchain==0.0.202
+langchain==0.0.234
 pinecone-client==2.2.2
 sentence_transformers==2.2.2
 openai==0.27.8
+
+sendgrid==6.10.0

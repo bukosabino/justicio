@@ -3,6 +3,8 @@ separator: "\n"
 chunk_size: 1800
 chunk_overlap: 100
 
+admin_email: bukosabino@gmail.com
+
 embeddings_model_name: dariolopez/roberta-base-bne-finetuned-msmarco-qa-es-mnrl-mn
 
 llm_model_name_old_0: gpt-3.5-turbo-0613
@@ -11,8 +13,8 @@ llm_model_name: gpt-3.5-turbo
 vector_store_index_name: boe-test
 top_k_results: 4
 
-date_start: 2022/09/06
-date_end: 2022/09/08
+date_start: 2023/03/15
+date_end: 2023/07/26
 
 # Prompts
 prompt_system_old_0: |

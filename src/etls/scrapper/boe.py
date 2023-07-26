@@ -2,7 +2,7 @@ import logging as lg
 import typing as tp
 import tempfile
 import unicodedata
-from datetime import date, timedelta
+from datetime import datetime, date, timedelta
 
 from bs4 import BeautifulSoup
 import requests
@@ -47,6 +47,8 @@ def _extract_metadata(soup) -> tp.Dict:
 
     if fecha_disposicion := soup.documento.metadatos.fecha_disposicion:
         metadata_dict['fecha_disposicion'] = fecha_disposicion.get_text()
+
+    metadata_dict['anio'] = datetime.strptime(fecha_publicacion.get_text(), '%Y%m%d').strftime('%Y')
 
     # Analisis
     if observaciones := soup.documento.analisis.observaciones:
@@ -137,7 +139,7 @@ class BOEScrapper(BaseScrapper):
                 except HTTPError:
                     logger.error("Not scrapped document %s on day %s", url_document, day_url)
         except HTTPError:
-            logger.error("Not scrapped document %s on day %s", url_document, day_url)
+            logger.error("Not scrapped document on day %s", day_url)
         logger.info("Downloaded BOE content for day %s", day)
         return metadata_documents
 

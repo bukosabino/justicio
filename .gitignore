@@ -160,6 +160,8 @@ cython_debug/
 .idea/
 
 .secrets
+.continous_deployment.md
+cron_etl_daily_public.sh
 
 *.pem
 

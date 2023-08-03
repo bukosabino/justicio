@@ -17,7 +17,7 @@ if __name__ == '__main__':
     docs = boe_scrapper.download_day(day)
     etl_job.run(docs)
 
-    subject = "Daily ETL executed"
+    subject = "[BOE] Daily ETL executed"
     content = f"""
     Daily ETL executed
     - Date: {day.strftime("%Y/%m/%d")}

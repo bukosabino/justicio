@@ -20,7 +20,7 @@ if __name__ == '__main__':
     # docs = [boe_scrapper.download_document("https://www.boe.es/diario_boe/xml.php?id=BOE-A-2022-14630")]
     etl_job.run(docs)
 
-    subject = "Initial ETL executed"
+    subject = "[BOE] Initial ETL executed"
     content = f"""
     Initial ETL executed
     - Date start: {INIT_OBJECTS.config_loader['date_start']}

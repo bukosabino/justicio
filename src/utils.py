@@ -3,8 +3,17 @@ from functools import wraps
 import logging as lg
 import time
 
+from langchain.vectorstores import SupabaseVectorStore
 from pydantic import BaseModel
 from langchain.schema import Document
+
+
+class StandardSupabaseVectorStore(SupabaseVectorStore):
+
+    def similarity_search_with_score(
+        self, query: str, k: int = 4, **kwargs: tp.Any
+    ) -> tp.List[tp.Tuple[Document, float]]:
+        return self.similarity_search_with_relevance_scores(query, k, **kwargs)
 
 
 class QAResponsePayloadModel(BaseModel):

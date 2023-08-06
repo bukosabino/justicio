@@ -22,7 +22,7 @@ class ETL:
     def run(self, docs: tp.List[BOEMetadataDocument]):
         chunks = self._split_documents(docs)
         self._load_database(chunks)
-        self._log_database_stats()
+        # self._log_database_stats()
 
     def _split_documents(self, docs: tp.List[BOEMetadataDocument]) -> tp.List[Document]:
         """Split documents by chunks
@@ -43,7 +43,8 @@ class ETL:
             )
             docs_chunks += text_splitter.split_documents(documents)
         logger.info('Removing file %s', doc.filepath)
-        os.remove(doc.filepath)
+        if doc:
+            os.remove(doc.filepath)
         logger.info("Splitted %s documents in %s chunks", len(docs), len(docs_chunks))
         return docs_chunks
 

@@ -4,11 +4,14 @@ import os
 import yaml
 
 import pinecone
+from supabase.client import Client, create_client
 from langchain.prompts import ChatPromptTemplate, HumanMessagePromptTemplate, SystemMessagePromptTemplate
 from langchain.vectorstores.pinecone import Pinecone
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.chains import RetrievalQA
 from langchain.chat_models import ChatOpenAI
+
+from src.utils import StandardSupabaseVectorStore
 
 
 def initialize_logging():
@@ -49,6 +52,17 @@ def _init_config():
 def _init_vector_store(config_loader):
     logger = lg.getLogger(_init_vector_store.__name__)
     logger.info("Initializing vector store")
+    if config_loader['vector_store'] == 'pinecone':
+        vector_store = _init_vector_store_pinecone(config_loader)
+    elif config_loader['vector_store'] == 'supabase':
+        vector_store = _init_vector_store_supabase(config_loader)
+    else:
+        raise ValueError('Vector Database not configured')
+    return vector_store
+
+
+def _init_vector_store_pinecone(config_loader):
+    logger = lg.getLogger(_init_vector_store_pinecone.__name__)
     pinecone.init(
         api_key=os.environ['PINECONE_API_KEY'],
         environment=os.environ['PINECONE_ENV'],
@@ -62,6 +76,16 @@ def _init_vector_store(config_loader):
     logger.info(pinecone.describe_index(index_name))
     logger.info(index.describe_index_stats())
     logger.info("Initialized vector store")
+    return vector_store
+
+
+def _init_vector_store_supabase(config_loader):
+    supabase_client: Client = create_client(os.environ.get("SUPABASE_API_URL"), os.environ.get("SUPABASE_API_KEY"))
+    embeddings = HuggingFaceEmbeddings(
+        model_name=config_loader['embeddings_model_name'], model_kwargs={'device': 'cpu'}
+    )
+    vector_store = StandardSupabaseVectorStore(
+        client=supabase_client, embedding=embeddings, table_name="documents", query_name="match_documents")
     return vector_store
 
 

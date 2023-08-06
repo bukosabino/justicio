@@ -23,7 +23,7 @@ DEFAULT_INPUT_QUERY = (
 @timeit
 async def healthcheck():
     """Asynchronous Health Check"""
-    # TODO: healthcheck with pinecone and openai
+    # TODO: healthcheck with embeddings db api and llm api
     return {"status": "OK"}
 
 

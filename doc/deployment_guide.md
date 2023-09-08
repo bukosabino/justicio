@@ -62,7 +62,7 @@ export APP_PATH="."
 Run the service
 
 ```
-nohup uvicorn src.service.main:APP --host=0.0.0.0 --port=5001 --workers=2 --timeout-keep-alive=125 --log-level=info > output.out 2>&1 &
+nohup uvicorn src.service.main:APP --host=0.0.0.0 --port=5001 --workers=2 --timeout-keep-alive=125 --log-level=info > logs/output.out 2>&1 &
 ```
 
 In the browser

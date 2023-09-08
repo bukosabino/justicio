@@ -69,6 +69,7 @@ the most similar documents returned by the embedding database.
 Options:
 * OpenAI (Third party API)
 * Falcon (Own API)
+* Llama2 (Own API)
 
 # Deploy your own service
 

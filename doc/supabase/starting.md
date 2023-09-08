@@ -1,12 +1,14 @@
+# 1. Create table and function
+
 -- Enable the pgvector extension to work with embedding vectors
 create extension vector;
 
 -- Create a table to store your documents
 create table documents (
-  id text primary key,
-  content text UNIQUE, -- corresponds to Document.pageContent
-  metadata jsonb, -- corresponds to Document.metadata
-  embedding vector(768) -- 1536 works for OpenAI embeddings, change if needed
+    id bigserial primary key,
+    content text, -- corresponds to Document.pageContent
+    metadata jsonb, -- corresponds to Document.metadata
+    embedding vector(768) -- 768 works for OpenAI embeddings, change if needed
 );
 
 -- Create a function to do queries
@@ -36,3 +38,9 @@ BEGIN
     LIMIT match_count;
 END;
 $$;
+
+
+# 2. Edit the type of `id` column from `documents` table from int8 to text.
+
+Using the Supabase UI
+

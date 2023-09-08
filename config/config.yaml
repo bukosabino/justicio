@@ -7,15 +7,12 @@ admin_email: bukosabino@gmail.com
 
 embeddings_model_name: dariolopez/roberta-base-bne-finetuned-msmarco-qa-es-mnrl-mn
 
-llm_model_name_old_0: gpt-3.5-turbo-0613
-llm_model_name: gpt-3.5-turbo
+llm_api: 'llama2'  # {'llama2', 'openai'}
 
-vector_store: 'supabase'  # {'pinecone', 'supabase'}
-vector_store_index_name: boe-test
+vector_store: 'pinecone'  # {'pinecone', 'supabase'}
 top_k_results: 4
-
-date_start: 2023/03/15
-date_end: 2023/03/31
+date_start: 2023/01/01
+date_end: 2023/09/08
 
 # Prompts
 prompt_system_old_0: |
@@ -30,3 +27,14 @@ prompt_system: |
   Por favor, asegúrate de responder siempre en español. Si no conoces la respuesta o no tienes suficiente información para responderla, simplemente admítelo; no intentes inventar una respuesta.
   Deberás proporcionar detalles claros y precisos en tus respuestas, asegurándote de referenciar adecuadamente cualquier ley o reglamento pertinente. Tu objetivo es proporcionar respuestas útiles y precisas para ayudar a los usuarios a entender mejor el BOE y cómo se aplica a sus preguntas.
   A continuación se proporcionan el contexto y la pregunta:
+
+# Pinecone
+vector_store_index_name: justicio
+
+# Supabase
+table_name: 'documents'
+query_name: 'match_documents'
+
+# Openai
+llm_model_name_old_0: gpt-3.5-turbo-0613
+llm_model_name: gpt-3.5-turbo

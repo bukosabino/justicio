@@ -80,12 +80,21 @@ def _init_vector_store_pinecone(config_loader):
 
 
 def _init_vector_store_supabase(config_loader):
-    supabase_client: Client = create_client(os.environ.get("SUPABASE_API_URL"), os.environ.get("SUPABASE_API_KEY"))
+    from supabase.lib.client_options import ClientOptions
+    supabase_client: Client = create_client(
+        supabase_url=os.environ.get("SUPABASE_API_URL"),
+        supabase_key=os.environ.get("SUPABASE_API_KEY"),
+        options=ClientOptions(postgrest_client_timeout=60),
+    )
     embeddings = HuggingFaceEmbeddings(
         model_name=config_loader['embeddings_model_name'], model_kwargs={'device': 'cpu'}
     )
     vector_store = StandardSupabaseVectorStore(
-        client=supabase_client, embedding=embeddings, table_name="documents", query_name="match_documents")
+        client=supabase_client,
+        embedding=embeddings,
+        table_name=config_loader["table_name"],
+        query_name=config_loader["query_name"]
+    )
     return vector_store
 
 

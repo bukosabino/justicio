@@ -10,6 +10,9 @@ from langchain.vectorstores.pinecone import Pinecone
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.chains import RetrievalQA
 from langchain.chat_models import ChatOpenAI
+from qdrant_client.models import Distance, VectorParams
+from qdrant_client import QdrantClient
+from langchain.vectorstores.qdrant import Qdrant
 
 from src.utils import StandardSupabaseVectorStore
 
@@ -56,6 +59,8 @@ def _init_vector_store(config_loader):
         vector_store = _init_vector_store_pinecone(config_loader)
     elif config_loader['vector_store'] == 'supabase':
         vector_store = _init_vector_store_supabase(config_loader)
+    elif config_loader['vector_store'] == 'qdrant':
+        vector_store = _init_vector_store_qdrant(config_loader)
     else:
         raise ValueError('Vector Database not configured')
     return vector_store
@@ -63,6 +68,7 @@ def _init_vector_store(config_loader):
 
 def _init_vector_store_pinecone(config_loader):
     logger = lg.getLogger(_init_vector_store_pinecone.__name__)
+    logger.info("Initializing vector store")
     pinecone.init(
         api_key=os.environ['PINECONE_API_KEY'],
         environment=os.environ['PINECONE_ENV'],
@@ -81,6 +87,9 @@ def _init_vector_store_pinecone(config_loader):
 
 def _init_vector_store_supabase(config_loader):
     from supabase.lib.client_options import ClientOptions
+
+    logger = lg.getLogger(_init_vector_store_supabase.__name__)
+    logger.info("Initializing vector store")
     supabase_client: Client = create_client(
         supabase_url=os.environ.get("SUPABASE_API_URL"),
         supabase_key=os.environ.get("SUPABASE_API_KEY"),
@@ -95,6 +104,30 @@ def _init_vector_store_supabase(config_loader):
         table_name=config_loader["table_name"],
         query_name=config_loader["query_name"]
     )
+    logger.info("Initialized vector store")
+    return vector_store
+
+
+def _init_vector_store_qdrant(config_loader):
+    logger = lg.getLogger(_init_vector_store_qdrant.__name__)
+    logger.info("Initializing vector store")
+    qdrant_client = QdrantClient(
+        url=os.environ['QDRANT_API_URL'],
+        api_key=os.environ['QDRANT_API_KEY'],
+        prefer_grpc=True
+    )
+    embeddings = HuggingFaceEmbeddings(
+        model_name=config_loader['embeddings_model_name'], model_kwargs={'device': 'cpu'}
+    )
+    if len(qdrant_client.get_collections().collections) == 0:
+        logger.info("Creating collection for vector store")
+        qdrant_client.recreate_collection(
+            collection_name=config_loader['collection_name'],
+            vectors_config=VectorParams(size=768, distance=Distance.COSINE),
+        )
+        logger.info("Created collection for vector store")
+    vector_store = Qdrant(qdrant_client, config_loader['collection_name'], embeddings)
+    logger.info("Initialized vector store")
     return vector_store
 
 

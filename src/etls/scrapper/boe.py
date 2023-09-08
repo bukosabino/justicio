@@ -1,3 +1,4 @@
+import copy
 import logging as lg
 import typing as tp
 import tempfile
@@ -84,21 +85,26 @@ def _extract_metadata(soup) -> tp.Dict:
 
 
 def _list_links_day(url: str) -> tp.List[str]:
-    """Get a list of links in a BOE url day.
+    """Get a list of links in a BOE url day filtering by Seccion 1 and Seccion T.
 
-    :param url: day url link. Example: https://www.boe.es/boe/dias/2022/09/07/
+    :param url: day url link. Example: https://www.boe.es/diario_boe/xml.php?id=BOE-S-20230817
     :return: list of id documents to explore (links)
     """
     logger = lg.getLogger(_list_links_day.__name__)
     logger.info("Scrapping day: %s", url)
     response = requests.get(url)
     response.raise_for_status()
-    soup = BeautifulSoup(response.text, 'html.parser')
+    soup = BeautifulSoup(response.text, 'lxml')
     id_links = [
-        link.find('a').get('href').split('?id=')[-1]
-        for link in soup.find_all('li', class_='puntoHTML')
+        url.text.split('?id=')[-1]
+        for section in soup.find_all(
+            lambda tag: tag.name == "seccion" and 'num' in tag.attrs and (
+                    tag.attrs['num'] == '1' or tag.attrs['num'] == 'T'
+            )
+        )
+        for url in section.find_all('urlxml')
     ]
-    logger.info("Scrapped day successfully %s", url)
+    logger.info("Scrapped day successfully %s (%s BOE documents)", url, len(id_links))
     return id_links
 
 
@@ -111,10 +117,11 @@ class BOEScrapper(BaseScrapper):
         logger.info("Downloading BOE content from day %s to %s", date_start, date_end)
         delta = timedelta(days=1)
         metadata_documents = []
-        while date_start <= date_end:
-            boe_docs = self.download_day(date_start)
+        date_start_aux = copy.copy(date_start)
+        while date_start_aux <= date_end:
+            boe_docs = self.download_day(date_start_aux)
             metadata_documents += boe_docs
-            date_start += delta
+            date_start_aux += delta
         logger.info("Downloaded BOE content from day %s to %s", date_start, date_end)
         return metadata_documents
 
@@ -123,19 +130,16 @@ class BOEScrapper(BaseScrapper):
         """
         logger = lg.getLogger(self.download_day.__name__)
         logger.info("Downloading BOE content for day %s", day)
-        day_str = day.strftime("%Y/%m/%d")
-        day_url = f"https://www.boe.es/boe/dias/{day_str}"
+        day_str = day.strftime("%Y%m%d")
+        day_url = f"https://www.boe.es/diario_boe/xml.php?id=BOE-S-{day_str}"
         metadata_documents = []
         try:
             id_links = _list_links_day(day_url)
             for id_link in id_links:
-                # TODO: versión mejorada... splitting by articles...
-                # url_document = f"https://www.boe.es/buscar/act.php?id={id_link}"
                 url_document = f"https://www.boe.es/diario_boe/xml.php?id={id_link}"
                 try:
                     metadata_doc = self.download_document(url_document)
                     metadata_documents.append(metadata_doc)
-                    # logger.error("Scrapped document %s on day %s", url_document, day_url)
                 except HTTPError:
                     logger.error("Not scrapped document %s on day %s", url_document, day_url)
         except HTTPError:

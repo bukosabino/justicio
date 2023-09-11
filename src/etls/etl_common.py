@@ -42,8 +42,8 @@ class ETL:
                 chunk_overlap=self._config_loader['chunk_overlap']
             )
             docs_chunks += text_splitter.split_documents(documents)
-        logger.info('Removing file %s', doc.filepath)
         if doc:
+            logger.info('Removing file %s', doc.filepath)
             os.remove(doc.filepath)
         logger.info("Splitted %s documents in %s chunks", len(docs), len(docs_chunks))
         return docs_chunks

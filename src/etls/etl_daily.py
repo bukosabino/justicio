@@ -15,12 +15,15 @@ if __name__ == '__main__':
     boe_scrapper = BOEScrapper()
     day = date.today()
     docs = boe_scrapper.download_day(day)
-    etl_job.run(docs)
+    if docs:
+        etl_job.run(docs)
 
     subject = "[BOE] Daily ETL executed"
     content = f"""
-    Daily ETL executed
-    - Date: {day.strftime("%Y/%m/%d")}
+    Initial ETL executed
+    - Date start: {INIT_OBJECTS.config_loader['date_start']}
+    - Date end: {INIT_OBJECTS.config_loader['date_end']}
     - Documents loaded: {len(docs)} 
+    - Database used: {INIT_OBJECTS.config_loader['vector_store']}
     """
     send_email(INIT_OBJECTS.config_loader, subject, content)

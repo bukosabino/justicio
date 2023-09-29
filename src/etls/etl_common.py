@@ -36,13 +36,13 @@ class ETL:
             loader = BOETextLoader(file_path=doc.filepath, metadata=doc.dict())
             documents = loader.load()
             text_splitter = CharacterTextSplitter(
-                separator=self._config_loader['separator'],
-                chunk_size=self._config_loader['chunk_size'],
-                chunk_overlap=self._config_loader['chunk_overlap']
+                separator=self._config_loader["separator"],
+                chunk_size=self._config_loader["chunk_size"],
+                chunk_overlap=self._config_loader["chunk_overlap"],
             )
             docs_chunks += text_splitter.split_documents(documents)
         if doc:
-            logger.info('Removing file %s', doc.filepath)
+            logger.info("Removing file %s", doc.filepath)
             os.remove(doc.filepath)
         logger.info("Splitted %s documents in %s chunks", len(docs), len(docs_chunks))
         return docs_chunks
@@ -56,7 +56,7 @@ class ETL:
 
     def _log_database_stats(self) -> None:
         logger = lg.getLogger(self._log_database_stats.__name__)
-        index_name = self._config_loader['vector_store_index_name']
+        index_name = self._config_loader["vector_store_index_name"]
         logger.info(pinecone.describe_index(index_name))
         index = pinecone.Index(index_name)
         logger.info(index.describe_index_stats())

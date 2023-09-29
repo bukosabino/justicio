@@ -7,8 +7,11 @@ import yaml
 from langchain.chains import RetrievalQA
 from langchain.chat_models import ChatOpenAI
 from langchain.embeddings import HuggingFaceEmbeddings
-from langchain.prompts import (ChatPromptTemplate, HumanMessagePromptTemplate,
-                               SystemMessagePromptTemplate)
+from langchain.prompts import (
+    ChatPromptTemplate,
+    HumanMessagePromptTemplate,
+    SystemMessagePromptTemplate,
+)
 from langchain.vectorstores.pinecone import Pinecone
 from langchain.vectorstores.qdrant import Qdrant
 from qdrant_client import QdrantClient
@@ -20,34 +23,35 @@ from src.utils import StandardSupabaseVectorStore
 
 def initialize_logging():
     logger = lg.getLogger()
-    logger.info('Initializing logging')
+    logger.info("Initializing logging")
     logger.handlers = []
     handler = lg.StreamHandler()
-    formatter = (
-        lg.Formatter('[%(asctime)s] [%(process)d] [%(levelname)s] [%(name)s] %(message)s')
+    formatter = lg.Formatter(
+        "[%(asctime)s] [%(process)d] [%(levelname)s] [%(name)s] %(message)s"
     )
     handler.setFormatter(formatter)
     logger.addHandler(handler)
     logger.setLevel(lg.INFO)
-    logger.info('Initialized logging')
-    lg.getLogger('uvicorn.error').handlers = logger.handlers
+    logger.info("Initialized logging")
+    lg.getLogger("uvicorn.error").handlers = logger.handlers
 
 
 def initialize_app():
-    """Initializes the application
-    """
+    """Initializes the application"""
     logger = lg.getLogger(initialize_app.__name__)
-    logger.info('Initializing application')
+    logger.info("Initializing application")
     config_loader = _init_config()
     vector_store = _init_vector_store(config_loader)
     retrieval_qa = _init_retrieval_qa_llm(vector_store, config_loader)
-    logger.info('Initialized application')
-    init_objects = collections.namedtuple('init_objects', ['config_loader', 'vector_store', 'retrieval_qa'])
+    logger.info("Initialized application")
+    init_objects = collections.namedtuple(
+        "init_objects", ["config_loader", "vector_store", "retrieval_qa"]
+    )
     return init_objects(config_loader, vector_store, retrieval_qa)
 
 
 def _init_config():
-    yaml_config_path = os.path.join(os.environ['APP_PATH'], 'config', 'config.yaml')
+    yaml_config_path = os.path.join(os.environ["APP_PATH"], "config", "config.yaml")
     with open(yaml_config_path, "r") as stream:
         config_loader = yaml.safe_load(stream)
     return config_loader
@@ -56,14 +60,14 @@ def _init_config():
 def _init_vector_store(config_loader):
     logger = lg.getLogger(_init_vector_store.__name__)
     logger.info("Initializing vector store")
-    if config_loader['vector_store'] == 'pinecone':
+    if config_loader["vector_store"] == "pinecone":
         vector_store = _init_vector_store_pinecone(config_loader)
-    elif config_loader['vector_store'] == 'supabase':
+    elif config_loader["vector_store"] == "supabase":
         vector_store = _init_vector_store_supabase(config_loader)
-    elif config_loader['vector_store'] == 'qdrant':
+    elif config_loader["vector_store"] == "qdrant":
         vector_store = _init_vector_store_qdrant(config_loader)
     else:
-        raise ValueError('Vector Database not configured')
+        raise ValueError("Vector Database not configured")
     return vector_store
 
 
@@ -71,13 +75,14 @@ def _init_vector_store_pinecone(config_loader):
     logger = lg.getLogger(_init_vector_store_pinecone.__name__)
     logger.info("Initializing vector store")
     pinecone.init(
-        api_key=os.environ['PINECONE_API_KEY'],
-        environment=os.environ['PINECONE_ENV'],
+        api_key=os.environ["PINECONE_API_KEY"],
+        environment=os.environ["PINECONE_ENV"],
     )
-    index_name = config_loader['vector_store_index_name']
+    index_name = config_loader["vector_store_index_name"]
     index = pinecone.Index(index_name)
     embeddings = HuggingFaceEmbeddings(
-        model_name=config_loader['embeddings_model_name'], model_kwargs={'device': 'cpu'}
+        model_name=config_loader["embeddings_model_name"],
+        model_kwargs={"device": "cpu"},
     )
     vector_store = Pinecone(index, embeddings.embed_query, "text")
     logger.info(pinecone.describe_index(index_name))
@@ -97,13 +102,14 @@ def _init_vector_store_supabase(config_loader):
         options=ClientOptions(postgrest_client_timeout=60),
     )
     embeddings = HuggingFaceEmbeddings(
-        model_name=config_loader['embeddings_model_name'], model_kwargs={'device': 'cpu'}
+        model_name=config_loader["embeddings_model_name"],
+        model_kwargs={"device": "cpu"},
     )
     vector_store = StandardSupabaseVectorStore(
         client=supabase_client,
         embedding=embeddings,
         table_name=config_loader["table_name"],
-        query_name=config_loader["query_name"]
+        query_name=config_loader["query_name"],
     )
     logger.info("Initialized vector store")
     return vector_store
@@ -113,22 +119,23 @@ def _init_vector_store_qdrant(config_loader):
     logger = lg.getLogger(_init_vector_store_qdrant.__name__)
     logger.info("Initializing vector store")
     qdrant_client = QdrantClient(
-        url=os.environ['QDRANT_API_URL'],
-        api_key=os.environ['QDRANT_API_KEY'],
-        prefer_grpc=True
+        url=os.environ["QDRANT_API_URL"],
+        api_key=os.environ["QDRANT_API_KEY"],
+        prefer_grpc=True,
     )
     embeddings = HuggingFaceEmbeddings(
-        model_name=config_loader['embeddings_model_name'], model_kwargs={'device': 'cpu'}
+        model_name=config_loader["embeddings_model_name"],
+        model_kwargs={"device": "cpu"},
     )
     if len(qdrant_client.get_collections().collections) == 0:
         logger.info("Creating collection for vector store")
         qdrant_client.recreate_collection(
-            collection_name=config_loader['collection_name'],
+            collection_name=config_loader["collection_name"],
             vectors_config=VectorParams(size=768, distance=Distance.COSINE),
-            on_disk_payload=True
+            on_disk_payload=True,
         )
         logger.info("Created collection for vector store")
-    vector_store = Qdrant(qdrant_client, config_loader['collection_name'], embeddings)
+    vector_store = Qdrant(qdrant_client, config_loader["collection_name"], embeddings)
     logger.info("Initialized vector store")
     return vector_store
 
@@ -144,15 +151,15 @@ def _init_retrieval_qa_llm(vector_store, config_loader):
     ]
     retrieval_qa = RetrievalQA.from_chain_type(
         llm=ChatOpenAI(
-            model_name=config_loader['llm_model_name'],
-            temperature=config_loader['temperature'],
-            max_tokens=config_loader['max_tokens']
+            model_name=config_loader["llm_model_name"],
+            temperature=config_loader["temperature"],
+            max_tokens=config_loader["max_tokens"],
         ),
         chain_type="stuff",
         retriever=retriever,
         chain_type_kwargs={
             "prompt": ChatPromptTemplate.from_messages(messages),
-            "verbose": True  # TODO: remove in production
+            "verbose": True,  # TODO: remove in production
         },
     )
     logger.info(retrieval_qa.combine_documents_chain.llm_chain.prompt.format)

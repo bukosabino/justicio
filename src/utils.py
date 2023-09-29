@@ -1,11 +1,11 @@
-import typing as tp
-from functools import wraps
 import logging as lg
 import time
+import typing as tp
+from functools import wraps
 
+from langchain.schema import Document
 from langchain.vectorstores import SupabaseVectorStore
 from pydantic import BaseModel
-from langchain.schema import Document
 
 
 class StandardSupabaseVectorStore(SupabaseVectorStore):

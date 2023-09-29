@@ -1,18 +1,19 @@
 import collections
 import logging as lg
 import os
-import yaml
 
 import pinecone
-from supabase.client import Client, create_client
-from langchain.prompts import ChatPromptTemplate, HumanMessagePromptTemplate, SystemMessagePromptTemplate
-from langchain.vectorstores.pinecone import Pinecone
-from langchain.embeddings import HuggingFaceEmbeddings
+import yaml
 from langchain.chains import RetrievalQA
 from langchain.chat_models import ChatOpenAI
-from qdrant_client.models import Distance, VectorParams
-from qdrant_client import QdrantClient
+from langchain.embeddings import HuggingFaceEmbeddings
+from langchain.prompts import (ChatPromptTemplate, HumanMessagePromptTemplate,
+                               SystemMessagePromptTemplate)
+from langchain.vectorstores.pinecone import Pinecone
 from langchain.vectorstores.qdrant import Qdrant
+from qdrant_client import QdrantClient
+from qdrant_client.models import Distance, VectorParams
+from supabase.client import Client, create_client
 
 from src.utils import StandardSupabaseVectorStore
 
@@ -124,6 +125,7 @@ def _init_vector_store_qdrant(config_loader):
         qdrant_client.recreate_collection(
             collection_name=config_loader['collection_name'],
             vectors_config=VectorParams(size=768, distance=Distance.COSINE),
+            on_disk_payload=True
         )
         logger.info("Created collection for vector store")
     vector_store = Qdrant(qdrant_client, config_loader['collection_name'], embeddings)
@@ -141,7 +143,11 @@ def _init_retrieval_qa_llm(vector_store, config_loader):
         HumanMessagePromptTemplate.from_template("{question}"),
     ]
     retrieval_qa = RetrievalQA.from_chain_type(
-        llm=ChatOpenAI(model_name=config_loader['llm_model_name'], temperature=0),
+        llm=ChatOpenAI(
+            model_name=config_loader['llm_model_name'],
+            temperature=config_loader['temperature'],
+            max_tokens=config_loader['max_tokens']
+        ),
         chain_type="stuff",
         retriever=retriever,
         chain_type_kwargs={

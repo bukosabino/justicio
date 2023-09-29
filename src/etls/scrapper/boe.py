@@ -1,18 +1,18 @@
 import copy
 import logging as lg
-import typing as tp
 import tempfile
+import typing as tp
 import unicodedata
-from datetime import datetime, date, timedelta
+from datetime import date, datetime, timedelta
 
-from bs4 import BeautifulSoup
 import requests
+from bs4 import BeautifulSoup
 from requests.exceptions import HTTPError
 
 from src.etls.scrapper.base import BaseScrapper
-from src.etls.utils import BOEMetadataDocument, BOEMetadataReferencia, BOEMetadataDocument2
+from src.etls.utils import (BOEMetadataDocument, BOEMetadataDocument2,
+                            BOEMetadataReferencia)
 from src.initialize import initialize_logging
-
 
 initialize_logging()
 

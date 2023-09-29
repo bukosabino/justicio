@@ -2,14 +2,13 @@ import logging as lg
 import os
 import typing as tp
 
-from langchain.text_splitter import CharacterTextSplitter
-from langchain.schema import Document
 import pinecone
+from langchain.schema import Document
+from langchain.text_splitter import CharacterTextSplitter
 from retry import retry
 
-from src.etls.utils import BOETextLoader, BOEMetadataDocument
+from src.etls.utils import BOEMetadataDocument, BOETextLoader
 from src.initialize import initialize_logging
-
 
 initialize_logging()
 
@@ -42,8 +41,8 @@ class ETL:
                 chunk_overlap=self._config_loader['chunk_overlap']
             )
             docs_chunks += text_splitter.split_documents(documents)
-        logger.info('Removing file %s', doc.filepath)
         if doc:
+            logger.info('Removing file %s', doc.filepath)
             os.remove(doc.filepath)
         logger.info("Splitted %s documents in %s chunks", len(docs), len(docs_chunks))
         return docs_chunks

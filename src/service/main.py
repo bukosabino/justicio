@@ -3,9 +3,8 @@ import uuid
 
 from fastapi import FastAPI
 
-from src.utils import QAResponsePayloadModel, timeit
 from src.initialize import initialize_app, initialize_logging
-
+from src.utils import QAResponsePayloadModel, timeit
 
 initialize_logging()
 
@@ -14,8 +13,8 @@ APP = FastAPI()
 INIT_OBJECTS = initialize_app()
 
 DEFAULT_INPUT_QUERY = (
-    "Según la Ley Orgánica 10/2022: ¿Es de aplicación esta ley a niños (varones) menores de edad víctimas de "
-    "violencias sexuales o solo a niñas y mujeres?"
+    "¿Es de aplicación la ley de garantía integral de la libertad sexual a niños (varones) menores de edad "
+    "víctimas de violencias sexuales o solo a niñas y mujeres?"
 )
 
 

@@ -1,10 +1,10 @@
-from dataclasses import dataclass
-from datetime import datetime, date
 import typing as tp
+from dataclasses import dataclass
+from datetime import date, datetime
 
-from pydantic import BaseModel, validator
 from langchain.docstore.document import Document
 from langchain.document_loaders.base import BaseLoader
+from pydantic import BaseModel, validator
 
 
 @dataclass

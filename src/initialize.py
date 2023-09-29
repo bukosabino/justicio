@@ -124,6 +124,7 @@ def _init_vector_store_qdrant(config_loader):
         qdrant_client.recreate_collection(
             collection_name=config_loader['collection_name'],
             vectors_config=VectorParams(size=768, distance=Distance.COSINE),
+            on_disk_payload=True
         )
         logger.info("Created collection for vector store")
     vector_store = Qdrant(qdrant_client, config_loader['collection_name'], embeddings)
@@ -141,7 +142,11 @@ def _init_retrieval_qa_llm(vector_store, config_loader):
         HumanMessagePromptTemplate.from_template("{question}"),
     ]
     retrieval_qa = RetrievalQA.from_chain_type(
-        llm=ChatOpenAI(model_name=config_loader['llm_model_name'], temperature=0),
+        llm=ChatOpenAI(
+            model_name=config_loader['llm_model_name'],
+            temperature=config_loader['temperature'],
+            max_tokens=config_loader['max_tokens']
+        ),
         chain_type="stuff",
         retriever=retriever,
         chain_type_kwargs={

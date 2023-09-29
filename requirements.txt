@@ -18,3 +18,7 @@ sentence_transformers==2.2.2
 openai==0.27.8
 
 sendgrid==6.10.0
+
+# Clean code tools
+black==23.9.1
+isort==5.12.0

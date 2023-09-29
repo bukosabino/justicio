@@ -2,10 +2,9 @@ import logging as lg
 import os
 
 from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Email, To, Content, Mail
+from sendgrid.helpers.mail import Content, Email, Mail, To
 
 from src.initialize import initialize_logging
-
 
 initialize_logging()
 

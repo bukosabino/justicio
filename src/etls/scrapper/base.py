@@ -1,5 +1,5 @@
-from abc import ABC, abstractmethod
 import typing as tp
+from abc import ABC, abstractmethod
 from datetime import date
 
 from src.etls.utils import BOEMetadataDocument

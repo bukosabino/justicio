@@ -32,8 +32,7 @@ async def semantic_search(input_query: str = DEFAULT_INPUT_QUERY):
     logger = lg.getLogger(semantic_search.__name__)
     logger.info(input_query)
     docs = INIT_OBJECTS.vector_store.similarity_search_with_score(
-        query=input_query,
-        k=INIT_OBJECTS.config_loader['top_k_results']
+        query=input_query, k=INIT_OBJECTS.config_loader["top_k_results"]
     )
     logger.info(docs)
     return docs
@@ -45,13 +44,10 @@ async def qa(input_query: str = DEFAULT_INPUT_QUERY):
     logger = lg.getLogger(qa.__name__)
     logger.info(input_query)
     docs = INIT_OBJECTS.vector_store.similarity_search_with_score(
-        query=input_query,
-        k=INIT_OBJECTS.config_loader['top_k_results']
+        query=input_query, k=INIT_OBJECTS.config_loader["top_k_results"]
     )
     answer = INIT_OBJECTS.retrieval_qa.run(input_query)
     response_payload = QAResponsePayloadModel(
-        scoring_id=str(uuid.uuid4()),
-        context=docs,
-        answer=answer
+        scoring_id=str(uuid.uuid4()), context=docs, answer=answer
     )
     return response_payload

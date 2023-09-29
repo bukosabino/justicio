@@ -21,8 +21,7 @@ if __name__ == '__main__':
     subject = "[BOE] Daily ETL executed"
     content = f"""
     Initial ETL executed
-    - Date start: {INIT_OBJECTS.config_loader['date_start']}
-    - Date end: {INIT_OBJECTS.config_loader['date_end']}
+    - Date: {day}
     - Documents loaded: {len(docs)} 
     - Database used: {INIT_OBJECTS.config_loader['vector_store']}
     """

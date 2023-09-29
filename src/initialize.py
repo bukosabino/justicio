@@ -124,6 +124,7 @@ def _init_vector_store_qdrant(config_loader):
         qdrant_client.recreate_collection(
             collection_name=config_loader['collection_name'],
             vectors_config=VectorParams(size=768, distance=Distance.COSINE),
+            on_disk_payload=True
         )
         logger.info("Created collection for vector store")
     vector_store = Qdrant(qdrant_client, config_loader['collection_name'], embeddings)

@@ -1,0 +1,55 @@
+// List all collections
+GET collections
+
+// Get collection info
+GET collections/justicio
+
+// List points in a collection, using filter by metadata
+POST collections/justicio/points/scroll
+{
+  "limit": 40000,
+  "filter": {
+    "must": [
+      {
+        "key": "metadata.anio",
+        "match": {
+          "value": "2018"
+        }
+      }
+    ]
+  }
+}
+
+// Count points in a collection, using filter by metadata
+POST collections/justicio/points/count
+{
+  "filter": {
+    "must": [
+      {
+        "key": "metadata.anio",
+        "match": {
+          "value": "2018"
+        }
+      }
+    ]
+  }
+}
+
+
+// Delete points in a collection, using filter by metadata
+POST collections/justicio/points/delete
+{
+  "filter": {
+    "must": [
+      {
+        "key": "metadata.anio",
+        "match": {
+          "value": "2018"
+        }
+      }
+    ]
+  }
+}
+
+// https://qdrant.tech/documentation/concepts/filtering/
+// https://qdrant.tech/documentation/concepts/points/

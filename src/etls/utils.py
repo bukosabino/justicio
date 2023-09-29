@@ -20,11 +20,11 @@ class BOEMetadataDocument2:
 
     def load_metadata(self) -> dict:
         metadata_dict = {
-            'title': self.title,
-            'url': self.url,
-            'document_id': self.document_id,
-            'date_doc': self.date_doc,
-            'datetime_insert': self.datetime_insert
+            "title": self.title,
+            "url": self.url,
+            "document_id": self.document_id,
+            "date_doc": self.date_doc,
+            "datetime_insert": self.datetime_insert,
         }
         return metadata_dict
 
@@ -37,26 +37,27 @@ class BOEMetadataReferencia(BaseModel):
 
 class BOEMetadataDocument(BaseModel):
     """Class for keeping metadata of a BOE Document scrapped."""
+
     # Text
     filepath: str
 
     # Metadatos
     identificador: str
-    numero_oficial: str = ''
+    numero_oficial: str = ""
     departamento: str
-    rango: str = ''
+    rango: str = ""
     titulo: str
     url_pdf: str
-    origen_legislativo: str = ''
+    origen_legislativo: str = ""
     fecha_publicacion: str
-    fecha_disposicion: str = ''
+    fecha_disposicion: str = ""
     anio: str
 
     # Analisis
-    observaciones: str = ''
-    ambito_geografico: str = ''
-    modalidad: str = ''
-    tipo: str = ''
+    observaciones: str = ""
+    ambito_geografico: str = ""
+    modalidad: str = ""
+    tipo: str = ""
     materias: tp.List[str]
     alertas: tp.List[str]
     notas: tp.List[str]
@@ -76,14 +77,19 @@ class BOEMetadataDocument(BaseModel):
     @validator("fecha_publicacion", "fecha_disposicion")
     def isoformat(cls, v):
         if v:
-            return datetime.strptime(v, '%Y%m%d').strftime('%Y-%m-%d')
+            return datetime.strptime(v, "%Y%m%d").strftime("%Y-%m-%d")
         return v
 
 
 class BOETextLoader(BaseLoader):
     """Load text files."""
 
-    def __init__(self, file_path: str, encoding: tp.Optional[str] = None, metadata: tp.Optional[dict] = None):
+    def __init__(
+        self,
+        file_path: str,
+        encoding: tp.Optional[str] = None,
+        metadata: tp.Optional[dict] = None,
+    ):
         """Initialize with file path."""
         self.file_path = file_path
         self.encoding = encoding

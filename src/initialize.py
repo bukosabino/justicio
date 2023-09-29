@@ -142,7 +142,11 @@ def _init_retrieval_qa_llm(vector_store, config_loader):
         HumanMessagePromptTemplate.from_template("{question}"),
     ]
     retrieval_qa = RetrievalQA.from_chain_type(
-        llm=ChatOpenAI(model_name=config_loader['llm_model_name'], temperature=0),
+        llm=ChatOpenAI(
+            model_name=config_loader['llm_model_name'],
+            temperature=config_loader['temperature'],
+            max_tokens=config_loader['max_tokens']
+        ),
         chain_type="stuff",
         retriever=retriever,
         chain_type_kwargs={

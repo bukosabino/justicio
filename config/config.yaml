@@ -7,8 +7,6 @@ admin_email: bukosabino@gmail.com
 
 embeddings_model_name: dariolopez/roberta-base-bne-finetuned-msmarco-qa-es-mnrl-mn
 
-llm_api: 'llama2'  # {'llama2', 'openai'}
-
 vector_store: 'qdrant'  # {'qdrant', 'pinecone', 'supabase'}
 top_k_results: 4
 date_start: 2017/01/01
@@ -41,3 +39,7 @@ query_name: 'match_documents'
 # Openai
 llm_model_name_old_0: gpt-3.5-turbo-0613
 llm_model_name: gpt-3.5-turbo
+temperature: 0
+max_tokens: 10000
+
+# llm_api: 'llama2'  # {'llama2', 'openai'}

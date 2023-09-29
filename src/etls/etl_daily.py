@@ -1,10 +1,9 @@
 from datetime import date
 
+from src.email.send_email import send_email
 from src.etls.etl_common import ETL
 from src.etls.scrapper.boe import BOEScrapper
 from src.initialize import initialize_app
-from src.email.send_email import send_email
-
 
 if __name__ == '__main__':
     INIT_OBJECTS = initialize_app()

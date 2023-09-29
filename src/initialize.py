@@ -1,18 +1,19 @@
 import collections
 import logging as lg
 import os
-import yaml
 
 import pinecone
-from supabase.client import Client, create_client
-from langchain.prompts import ChatPromptTemplate, HumanMessagePromptTemplate, SystemMessagePromptTemplate
-from langchain.vectorstores.pinecone import Pinecone
-from langchain.embeddings import HuggingFaceEmbeddings
+import yaml
 from langchain.chains import RetrievalQA
 from langchain.chat_models import ChatOpenAI
-from qdrant_client.models import Distance, VectorParams
-from qdrant_client import QdrantClient
+from langchain.embeddings import HuggingFaceEmbeddings
+from langchain.prompts import (ChatPromptTemplate, HumanMessagePromptTemplate,
+                               SystemMessagePromptTemplate)
+from langchain.vectorstores.pinecone import Pinecone
 from langchain.vectorstores.qdrant import Qdrant
+from qdrant_client import QdrantClient
+from qdrant_client.models import Distance, VectorParams
+from supabase.client import Client, create_client
 
 from src.utils import StandardSupabaseVectorStore
 

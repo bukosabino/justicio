@@ -3,9 +3,8 @@ import uuid
 
 from fastapi import FastAPI
 
-from src.utils import QAResponsePayloadModel, timeit
 from src.initialize import initialize_app, initialize_logging
-
+from src.utils import QAResponsePayloadModel, timeit
 
 initialize_logging()
 

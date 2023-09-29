@@ -2,14 +2,13 @@ import logging as lg
 import os
 import typing as tp
 
-from langchain.text_splitter import CharacterTextSplitter
-from langchain.schema import Document
 import pinecone
+from langchain.schema import Document
+from langchain.text_splitter import CharacterTextSplitter
 from retry import retry
 
-from src.etls.utils import BOETextLoader, BOEMetadataDocument
+from src.etls.utils import BOEMetadataDocument, BOETextLoader
 from src.initialize import initialize_logging
-
 
 initialize_logging()
 

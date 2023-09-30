@@ -1,10 +1,11 @@
 import logging as lg
+import time
 import uuid
 
 from fastapi import FastAPI
 
 from src.initialize import initialize_app, initialize_logging
-from src.utils import QAResponsePayloadModel, timeit
+from src.utils import timeit
 
 initialize_logging()
 
@@ -38,7 +39,7 @@ async def semantic_search(input_query: str = DEFAULT_INPUT_QUERY):
     return docs
 
 
-@APP.get("/qa", response_model=QAResponsePayloadModel)
+@APP.get("/qa")
 @timeit
 async def qa(input_query: str = DEFAULT_INPUT_QUERY):
     logger = lg.getLogger(qa.__name__)
@@ -47,7 +48,12 @@ async def qa(input_query: str = DEFAULT_INPUT_QUERY):
         query=input_query, k=INIT_OBJECTS.config_loader["top_k_results"]
     )
     answer = INIT_OBJECTS.retrieval_qa.run(input_query)
-    response_payload = QAResponsePayloadModel(
-        scoring_id=str(uuid.uuid4()), context=docs, answer=answer
-    )
+    response_payload = dict(scoring_id=str(uuid.uuid4()), context=docs, answer=answer)
     return response_payload
+
+
+@APP.get("/sleep")
+@timeit
+async def sleep():
+    time.sleep(5)
+    return {"status": "OK"}

@@ -1,17 +1,19 @@
 PyYAML==6.0
 
-fastapi==0.97.0
-uvicorn==0.22.0
+fastapi==0.103.2
+uvicorn==0.23.2
 
 requests==2.31.0
 beautifulsoup4==4.12.2
 lxml==4.9.2
-pydantic==1.10.10
+pydantic==2.4.2
 
 retry==0.9.2
 
-langchain==0.0.285
-qdrant-client==1.5.0
+langchain==0.0.305
+# langchainplus-sdk==0.0.20
+langsmith==0.0.41
+qdrant-client==1.5.4
 supabase==1.0.2
 pinecone-client==2.2.2
 sentence_transformers==2.2.2

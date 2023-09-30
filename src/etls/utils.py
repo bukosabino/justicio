@@ -4,7 +4,7 @@ from datetime import date, datetime
 
 from langchain.docstore.document import Document
 from langchain.document_loaders.base import BaseLoader
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, field_validator
 
 
 @dataclass
@@ -66,15 +66,18 @@ class BOEMetadataDocument(BaseModel):
 
     datetime_insert: str = datetime.utcnow().isoformat()
 
-    @validator("ref_posteriores")
+    @field_validator("ref_posteriores")
+    @classmethod
     def ref_posteriores_to_json(cls, validators):
         return [v.json() for v in validators]
 
-    @validator("ref_anteriores")
+    @field_validator("ref_anteriores")
+    @classmethod
     def ref_anteriores_to_json(cls, validators):
         return [v.json() for v in validators]
 
-    @validator("fecha_publicacion", "fecha_disposicion")
+    @field_validator("fecha_publicacion", "fecha_disposicion")
+    @classmethod
     def isoformat(cls, v):
         if v:
             return datetime.strptime(v, "%Y%m%d").strftime("%Y-%m-%d")

@@ -1,0 +1,3 @@
+Method,Name,Error,Occurrences
+GET,/aqa,"ConnectionResetError(54, 'Connection reset by peer')",16
+GET,/aqa,HTTPError('500 Server Error: Internal Server Error for url: /aqa'),33

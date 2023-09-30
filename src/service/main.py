@@ -1,8 +1,10 @@
+import asyncio
 import logging as lg
 import time
 import uuid
 
 from fastapi import FastAPI
+import httpx
 
 from src.initialize import initialize_app, initialize_logging
 from src.utils import timeit
@@ -32,11 +34,18 @@ async def healthcheck():
 async def semantic_search(input_query: str = DEFAULT_INPUT_QUERY):
     logger = lg.getLogger(semantic_search.__name__)
     logger.info(input_query)
-    docs = INIT_OBJECTS.vector_store.similarity_search_with_score(
+    docs = await INIT_OBJECTS.vector_store.asimilarity_search_with_score(
         query=input_query, k=INIT_OBJECTS.config_loader["top_k_results"]
     )
     logger.info(docs)
     return docs
+
+
+async def a_request_get(url):
+    """Requests for sync/async load tests"""
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        response = await client.get(url)
+        return response.text
 
 
 @APP.get("/qa")
@@ -44,10 +53,10 @@ async def semantic_search(input_query: str = DEFAULT_INPUT_QUERY):
 async def qa(input_query: str = DEFAULT_INPUT_QUERY):
     logger = lg.getLogger(qa.__name__)
     logger.info(input_query)
-    docs = INIT_OBJECTS.vector_store.similarity_search_with_score(
+    docs = await INIT_OBJECTS.vector_store.asimilarity_search_with_score(
         query=input_query, k=INIT_OBJECTS.config_loader["top_k_results"]
     )
-    answer = INIT_OBJECTS.retrieval_qa.run(input_query)
+    answer = await INIT_OBJECTS.retrieval_qa.arun(input_query)
     response_payload = dict(scoring_id=str(uuid.uuid4()), context=docs, answer=answer)
     return response_payload
 
@@ -56,4 +65,11 @@ async def qa(input_query: str = DEFAULT_INPUT_QUERY):
 @timeit
 async def sleep():
     time.sleep(5)
+    return {"status": "OK"}
+
+
+@APP.get("/asleep")
+@timeit
+async def asleep():
+    await asyncio.sleep(5)
     return {"status": "OK"}

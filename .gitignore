@@ -167,3 +167,5 @@ cron_etl_initial.sh
 *.pem
 
 xmls/
+
+.DS_Store

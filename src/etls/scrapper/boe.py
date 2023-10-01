@@ -186,31 +186,3 @@ class BOEScrapper(BaseScrapper):
         metadata_doc = BOEMetadataDocument(filepath=fn.name, **_extract_metadata(soup))
         logger.info("Scrapped document successfully %s", url)
         return metadata_doc
-
-    def download_document_txt(self, url: str) -> BOEMetadataDocument2:
-        # NOTE: deprecated
-
-        """Get a text document from a BOE url document.
-
-        :param url: document url link. Example: https://www.boe.es/diario_boe/txt.php?id=BOE-A-2022-14630
-        :return: document with text content
-        """
-        logger = lg.getLogger(self.download_document_txt.__name__)
-        logger.info("Scrapping document: %s", url)
-        response = requests.get(url)
-        response.raise_for_status()
-        with tempfile.NamedTemporaryFile("w", delete=False) as fn:
-            soup = BeautifulSoup(response.text, "html.parser")  # 'html5lib'
-            text = soup.find("div", id="textoxslt").get_text()
-            text = unicodedata.normalize("NFKC", text)
-            fn.write(text)
-        span_tag = soup.find("span", class_="puntoConso")
-        if span_tag:
-            span_tag = span_tag.extract()
-            # TODO: link to span_tag.a['href'] to improve the split by articles -> https://www.boe.es/buscar/act.php?id=BOE-A-2022-14630
-        title = soup.find("h3", class_="documento-tit").get_text()
-        metadata_doc = BOEMetadataDocument2(
-            filepath=fn.name, title=title, url=url, document_id=url.split("?id=")[-1]
-        )
-        logger.info("Scrapped document successfully %s", url)
-        return metadata_doc

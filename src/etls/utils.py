@@ -1,32 +1,9 @@
 import typing as tp
-from dataclasses import dataclass
-from datetime import date, datetime
+from datetime import datetime
 
 from langchain.docstore.document import Document
 from langchain.document_loaders.base import BaseLoader
 from pydantic import BaseModel, field_validator
-
-
-@dataclass
-class BOEMetadataDocument2:
-    # NOTE: deprecated
-    """Class for keeping metadata of a BOE Document scrapped."""
-    filepath: str
-    title: str
-    url: str
-    document_id: str
-    date_doc: str = date.today().isoformat()
-    datetime_insert: str = datetime.utcnow().isoformat()
-
-    def load_metadata(self) -> dict:
-        metadata_dict = {
-            "title": self.title,
-            "url": self.url,
-            "document_id": self.document_id,
-            "date_doc": self.date_doc,
-            "datetime_insert": self.datetime_insert,
-        }
-        return metadata_dict
 
 
 class BOEMetadataReferencia(BaseModel):

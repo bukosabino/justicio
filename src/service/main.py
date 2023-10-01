@@ -3,8 +3,8 @@ import logging as lg
 import time
 import uuid
 
-from fastapi import FastAPI
 import httpx
+from fastapi import FastAPI
 
 from src.initialize import initialize_app, initialize_logging
 from src.utils import timeit

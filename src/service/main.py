@@ -48,16 +48,27 @@ async def a_request_get(url):
         return response.text
 
 
+"""
 @APP.get("/qa")
 @timeit
 async def qa(input_query: str = DEFAULT_INPUT_QUERY):
     logger = lg.getLogger(qa.__name__)
     logger.info(input_query)
-    docs = await INIT_OBJECTS.vector_store.asimilarity_search_with_score(
-        query=input_query, k=INIT_OBJECTS.config_loader["top_k_results"]
-    )
     answer = await INIT_OBJECTS.retrieval_qa.arun(input_query)
     response_payload = dict(scoring_id=str(uuid.uuid4()), context=docs, answer=answer)
+    return response_payload
+"""
+
+
+@APP.get("/qa")
+@timeit
+async def qa(input_query: str = DEFAULT_INPUT_QUERY):
+    logger = lg.getLogger(qa.__name__)
+    logger.info(input_query)
+    response = INIT_OBJECTS.retrieval_qa(input_query)  # TODO: check if we can work async
+    response_payload = dict(
+        scoring_id=str(uuid.uuid4()), context=response['source_documents'], answer=response['result']
+    )
     return response_payload
 
 

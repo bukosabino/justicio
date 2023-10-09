@@ -12,7 +12,6 @@ from requests.exceptions import HTTPError
 from src.etls.scrapper.base import BaseScrapper
 from src.etls.utils import (
     BOEMetadataDocument,
-    BOEMetadataDocument2,
     BOEMetadataReferencia,
 )
 from src.initialize import initialize_logging

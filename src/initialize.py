@@ -161,8 +161,7 @@ def _init_retrieval_qa_llm(vector_store, config_loader):
         return_source_documents=True,
         retriever=retriever,
         chain_type_kwargs={
-            "prompt": ChatPromptTemplate.from_messages(messages),
-            "verbose": True,  # TODO: remove in production
+            "prompt": ChatPromptTemplate.from_messages(messages)
         },
     )
     logger.info(retrieval_qa.combine_documents_chain.llm_chain.prompt.format)

@@ -4,7 +4,7 @@ import typing as tp
 
 import pinecone
 from langchain.schema import Document
-from langchain.text_splitter import CharacterTextSplitter
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 from retry import retry
 
 from src.etls.utils import BOEMetadataDocument, BOETextLoader
@@ -35,8 +35,7 @@ class ETL:
         for doc in docs:
             loader = BOETextLoader(file_path=doc.filepath, metadata=doc.dict())
             documents = loader.load()
-            text_splitter = CharacterTextSplitter(
-                separator=self._config_loader["separator"],
+            text_splitter = RecursiveCharacterTextSplitter(
                 chunk_size=self._config_loader["chunk_size"],
                 chunk_overlap=self._config_loader["chunk_overlap"],
             )

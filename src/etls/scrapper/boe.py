@@ -10,10 +10,7 @@ from bs4 import BeautifulSoup
 from requests.exceptions import HTTPError
 
 from src.etls.scrapper.base import BaseScrapper
-from src.etls.utils import (
-    BOEMetadataDocument,
-    BOEMetadataReferencia,
-)
+from src.etls.utils import BOEMetadataDocument, BOEMetadataReferencia
 from src.initialize import initialize_logging
 
 initialize_logging()

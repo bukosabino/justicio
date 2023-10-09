@@ -65,9 +65,13 @@ async def qa(input_query: str = DEFAULT_INPUT_QUERY):
 async def qa(input_query: str = DEFAULT_INPUT_QUERY):
     logger = lg.getLogger(qa.__name__)
     logger.info(input_query)
-    response = INIT_OBJECTS.retrieval_qa(input_query)  # TODO: check if we can work async
+    response = INIT_OBJECTS.retrieval_qa(
+        input_query
+    )  # TODO: check if we can work async
     response_payload = dict(
-        scoring_id=str(uuid.uuid4()), context=response['source_documents'], answer=response['result']
+        scoring_id=str(uuid.uuid4()),
+        context=response["source_documents"],
+        answer=response["result"],
     )
     return response_payload
 

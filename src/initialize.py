@@ -144,8 +144,7 @@ def _init_retrieval_qa_llm(vector_store, config_loader):
     logger = lg.getLogger(_init_retrieval_qa_llm.__name__)
     logger.info("Initializing RetrievalQA LLM")
     retriever = vector_store.as_retriever(
-        search_type="similarity",
-        search_kwargs={'k': config_loader['top_k_results']}
+        search_type="similarity", search_kwargs={"k": config_loader["top_k_results"]}
     )
     system_template = f"{config_loader['prompt_system']}----------------\n{{context}}"
     messages = [

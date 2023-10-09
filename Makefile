@@ -2,10 +2,10 @@ init:
 	pip install -r requirements.txt
 
 isort:
-	isort --check-only src
+	isort --check-only src evaluation
 
 format: isort
-	black src
+	black src evaluation
 
 isort-fix:
-	isort src
+	isort src evaluation

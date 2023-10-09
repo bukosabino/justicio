@@ -1,7 +1,6 @@
 from evaluation.embeddings.questions import QUERIES
 from src.initialize import initialize_app
 
-
 INIT_OBJECTS = initialize_app()
 
 
@@ -11,8 +10,7 @@ for boe_id, question in QUERIES:
         query=question, k=INIT_OBJECTS.config_loader["top_k_results"]
     )
     for doc in docs:
-
-        if doc[0].metadata['identificador'] == boe_id:
+        if doc[0].metadata["identificador"] == boe_id:
             success += 1
             # break
 

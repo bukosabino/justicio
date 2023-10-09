@@ -7,7 +7,7 @@ admin_email: bukosabino@gmail.com
 embeddings_model_name: dariolopez/roberta-base-bne-finetuned-msmarco-qa-es-mnrl-mn
 
 vector_store: 'qdrant'  # {'qdrant', 'pinecone', 'supabase'}
-top_k_results: 6
+top_k_results: 5
 date_start: 2015/01/01
 date_end: 2016/12/31
 

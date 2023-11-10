@@ -143,7 +143,9 @@ def _init_vector_store_qdrant(config_loader):
 def _init_retrieval_qa_llm(vector_store, config_loader):
     logger = lg.getLogger(_init_retrieval_qa_llm.__name__)
     logger.info("Initializing RetrievalQA LLM")
-    retriever = vector_store.as_retriever()
+    retriever = vector_store.as_retriever(
+        search_type="similarity", search_kwargs={"k": config_loader["top_k_results"]}
+    )
     system_template = f"{config_loader['prompt_system']}----------------\n{{context}}"
     messages = [
         SystemMessagePromptTemplate.from_template(system_template),
@@ -156,10 +158,10 @@ def _init_retrieval_qa_llm(vector_store, config_loader):
             max_tokens=config_loader["max_tokens"],
         ),
         chain_type="stuff",
+        return_source_documents=True,
         retriever=retriever,
         chain_type_kwargs={
-            "prompt": ChatPromptTemplate.from_messages(messages),
-            "verbose": True,  # TODO: remove in production
+            "prompt": ChatPromptTemplate.from_messages(messages)
         },
     )
     logger.info(retrieval_qa.combine_documents_chain.llm_chain.prompt.format)

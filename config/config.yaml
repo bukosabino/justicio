@@ -8,9 +8,9 @@ admin_email: bukosabino@gmail.com
 embeddings_model_name: dariolopez/roberta-base-bne-finetuned-msmarco-qa-es-mnrl-mn
 
 vector_store: 'qdrant'  # {'qdrant', 'pinecone', 'supabase'}
-top_k_results: 4
-date_start: 2017/01/01
-date_end: 2019/12/31
+top_k_results: 5
+date_start: 2023/01/01
+date_end: 2023/12/31
 
 # Prompts
 prompt_system_old_0: |
@@ -20,9 +20,15 @@ prompt_system_old_0: |
   Responde siempre en español.
   Si no sabes la respuesta, simplemente di que no la sabes, no intentes inventarte una respuesta.
 
-prompt_system: |
+prompt_system_old_1: |
   Como un experto en derecho y leyes españolas, tu tarea es responder preguntas sobre el Boletín Oficial del Estado (BOE) de España. Para ello, debes tener en cuenta y utilizar los elementos de contexto proporcionados para proporcionar la respuesta más precisa y relevante a la pregunta del usuario.
   Por favor, asegúrate de responder siempre en español. Si no conoces la respuesta o no tienes suficiente información para responderla, simplemente admítelo; no intentes inventar una respuesta.
+  Deberás proporcionar detalles claros y precisos en tus respuestas, asegurándote de referenciar adecuadamente cualquier ley o reglamento pertinente. Tu objetivo es proporcionar respuestas útiles y precisas para ayudar a los usuarios a entender mejor el BOE y cómo se aplica a sus preguntas.
+  A continuación se proporcionan el contexto y la pregunta:
+
+prompt_system: |
+  Como un experto en derecho y leyes españolas, tu tarea es responder preguntas sobre el Boletín Oficial del Estado (BOE) de España. Para ello, debes tener en cuenta y utilizar el contexto proporcionado para responder de forma precisa a la pregunta del usuario.
+  Asegúrate de responder siempre en español. Si no conoces la respuesta o no tienes suficiente información para responderla, simplemente admítelo; no intentes inventar una respuesta.
   Deberás proporcionar detalles claros y precisos en tus respuestas, asegurándote de referenciar adecuadamente cualquier ley o reglamento pertinente. Tu objetivo es proporcionar respuestas útiles y precisas para ayudar a los usuarios a entender mejor el BOE y cómo se aplica a sus preguntas.
   A continuación se proporcionan el contexto y la pregunta:
 

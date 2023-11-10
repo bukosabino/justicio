@@ -6,6 +6,11 @@ from langchain.document_loaders.base import BaseLoader
 from pydantic import BaseModel, field_validator
 
 
+class SourceMetadata(BaseModel):
+    name: str
+    type: str
+
+
 class BOEMetadataReferencia(BaseModel):
     id: str
     palabra: str
@@ -19,6 +24,8 @@ class BOEMetadataDocument(BaseModel):
     filepath: str
 
     # Metadatos
+    source_name: str = "BOE"
+    source_type: str = "Boletin"
     identificador: str
     numero_oficial: str = ""
     departamento: str
@@ -29,6 +36,8 @@ class BOEMetadataDocument(BaseModel):
     fecha_publicacion: str
     fecha_disposicion: str = ""
     anio: str
+    mes: str
+    dia: str
 
     # Analisis
     observaciones: str = ""

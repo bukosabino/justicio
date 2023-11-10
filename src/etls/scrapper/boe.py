@@ -51,6 +51,14 @@ def _extract_metadata(soup) -> tp.Dict:
         fecha_publicacion.get_text(), "%Y%m%d"
     ).strftime("%Y")
 
+    metadata_dict["mes"] = datetime.strptime(
+        fecha_publicacion.get_text(), "%Y%m%d"
+    ).strftime("%m")
+
+    metadata_dict["dia"] = datetime.strptime(
+        fecha_publicacion.get_text(), "%Y%m%d"
+    ).strftime("%d")
+
     # Analisis
     if observaciones := soup.documento.analisis.observaciones:
         metadata_dict["observaciones"] = observaciones.get_text()

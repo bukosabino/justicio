@@ -1,15 +1,14 @@
-import copy
 import logging as lg
 import tempfile
 import typing as tp
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 
 import requests
 from bs4 import BeautifulSoup
 from requests.exceptions import HTTPError
 
-from src.etls.scrapper.base import BaseScrapper
-from src.etls.utils import BOEMetadataDocument, BOEMetadataReferencia
+from src.etls.boe.metadata import BOEMetadataDocument, BOEMetadataReferencia
+from src.etls.common.scrapper import BaseScrapper
 from src.initialize import initialize_logging
 
 initialize_logging()
@@ -131,22 +130,6 @@ def _list_links_day(url: str) -> tp.List[str]:
 
 
 class BOEScrapper(BaseScrapper):
-    def download_days(
-        self, date_start: date, date_end: date
-    ) -> tp.List[BOEMetadataDocument]:
-        """Download all the documents between two dates (from date_start to date_end)"""
-        logger = lg.getLogger(self.download_days.__name__)
-        logger.info("Downloading BOE content from day %s to %s", date_start, date_end)
-        delta = timedelta(days=1)
-        metadata_documents = []
-        date_start_aux = copy.copy(date_start)
-        while date_start_aux <= date_end:
-            boe_docs = self.download_day(date_start_aux)
-            metadata_documents += boe_docs
-            date_start_aux += delta
-        logger.info("Downloaded BOE content from day %s to %s", date_start, date_end)
-        return metadata_documents
-
     def download_day(self, day: date) -> tp.List[BOEMetadataDocument]:
         """Download all the documents for a specific date."""
         logger = lg.getLogger(self.download_day.__name__)

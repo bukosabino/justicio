@@ -52,6 +52,7 @@ async def a_request_get(url):
 @APP.get("/qa")
 @timeit
 async def qa(input_query: str = DEFAULT_INPUT_QUERY):
+    # TODO: write a solution not using Langchain
     logger = lg.getLogger(qa.__name__)
     logger.info(input_query)
     answer = await INIT_OBJECTS.retrieval_qa.arun(input_query)
@@ -63,6 +64,7 @@ async def qa(input_query: str = DEFAULT_INPUT_QUERY):
 @APP.get("/qa")
 @timeit
 async def qa(input_query: str = DEFAULT_INPUT_QUERY):
+    # TODO: write a solution not using Langchain
     logger = lg.getLogger(qa.__name__)
     logger.info(input_query)
     response = INIT_OBJECTS.retrieval_qa(

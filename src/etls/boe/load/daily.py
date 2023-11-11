@@ -1,8 +1,8 @@
 from datetime import date
 
 from src.email.send_email import send_email
-from src.etls.etl_common import ETL
-from src.etls.scrapper.boe import BOEScrapper
+from src.etls.boe.scrapper import BOEScrapper
+from src.etls.common.etl import ETL
 from src.initialize import initialize_app
 
 if __name__ == "__main__":
@@ -18,7 +18,7 @@ if __name__ == "__main__":
 
     subject = "[BOE] Daily ETL executed"
     content = f"""
-    Initial ETL executed
+    Daily ETL executed
     - Date: {day}
     - Documents loaded: {len(docs)} 
     - Database used: {INIT_OBJECTS.config_loader['vector_store']}

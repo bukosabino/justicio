@@ -1,14 +1,9 @@
 import typing as tp
 from datetime import datetime
 
-from langchain.docstore.document import Document
-from langchain.document_loaders.base import BaseLoader
 from pydantic import BaseModel, field_validator
 
-
-class SourceMetadata(BaseModel):
-    name: str
-    type: str
+from src.etls.common.metadata import MetadataDocument
 
 
 class BOEMetadataReferencia(BaseModel):
@@ -17,15 +12,17 @@ class BOEMetadataReferencia(BaseModel):
     texto: str
 
 
-class BOEMetadataDocument(BaseModel):
+class BOEMetadataDocument(MetadataDocument):
     """Class for keeping metadata of a BOE Document scrapped."""
 
     # Text
     filepath: str
 
-    # Metadatos
+    # Source
     source_name: str = "BOE"
     source_type: str = "Boletin"
+
+    # Metadatos
     identificador: str
     numero_oficial: str = ""
     departamento: str
@@ -68,24 +65,3 @@ class BOEMetadataDocument(BaseModel):
         if v:
             return datetime.strptime(v, "%Y%m%d").strftime("%Y-%m-%d")
         return v
-
-
-class BOETextLoader(BaseLoader):
-    """Load text files."""
-
-    def __init__(
-        self,
-        file_path: str,
-        encoding: tp.Optional[str] = None,
-        metadata: tp.Optional[dict] = None,
-    ):
-        """Initialize with file path."""
-        self.file_path = file_path
-        self.encoding = encoding
-        self.metadata = metadata
-
-    def load(self) -> tp.List[Document]:
-        """Load from file path."""
-        with open(self.file_path, encoding=self.encoding) as f:
-            text = f.read()
-        return [Document(page_content=text, metadata=self.metadata)]

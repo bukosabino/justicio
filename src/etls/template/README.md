@@ -11,7 +11,7 @@ To define an ETL for your gazette, you need to fill some files:
 
 1. `metadata.py` Define the metadata to be stored in the embedding database.
 2. `scrapper.py` Define a class with some methods to scrape the information. 
-3. `load' folder where you can define the different scripts to load the data.
+3. `load` folder where you can define the different scripts to load the data.
 
 ### Batch/Historical Load
 

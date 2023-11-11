@@ -23,13 +23,13 @@ export APP_PATH="."
 Load BOE documents into your vector database (depending on the selected data, may take a few minutes)
 
 ```
-python -m src.etls.etl_initial
+python -m src.etls.boe.load.run
 ```
 
 If you want to update the vector database on a daily basis (BOE publishes new documents every day), run this file as a scheduled job (e.g. with CRON).
 
 ```
-python -m src.etls.etl_daily
+python -m src.etls.boe.load.daily
 ```
 
 ## 2. Deploy the service

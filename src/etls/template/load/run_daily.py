@@ -1,7 +1,8 @@
+from datetime import date
+
 from src.email.send_email import send_email
-from src.etls.defs import boe_ids
-from src.etls.etl_common import ETL
-from src.etls.scrapper.boe import BOEScrapper
+from src.etls.common.etl import ETL
+from src.etls.template.scrapper import TemplateScrapper
 from src.initialize import initialize_app
 
 if __name__ == "__main__":
@@ -9,18 +10,16 @@ if __name__ == "__main__":
     etl_job = ETL(
         config_loader=INIT_OBJECTS.config_loader, vector_store=INIT_OBJECTS.vector_store
     )
-    boe_scrapper = BOEScrapper()
-    docs = []
-    for boe_id in boe_ids:
-        url = f"https://www.boe.es/diario_boe/xml.php?id={boe_id}"
-        docs.append(boe_scrapper.download_document(url))
+    boe_scrapper = TemplateScrapper()
+    day = date.today()
+    docs = boe_scrapper.download_day(day)
     if docs:
         etl_job.run(docs)
 
-    subject = "[BOE] Documents ETL executed"
+    subject = "Daily ETL executed"
     content = f"""
-    Documents ETL executed
-    - Documents loaded (BOE ids): {len(boe_ids)}
+    Daily ETL executed
+    - Date: {day}
     - Documents loaded: {len(docs)} 
     - Database used: {INIT_OBJECTS.config_loader['vector_store']}
     """

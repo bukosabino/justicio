@@ -8,8 +8,8 @@ embeddings_model_name: dariolopez/roberta-base-bne-finetuned-msmarco-qa-es-mnrl-
 
 vector_store: 'qdrant'  # {'qdrant', 'pinecone', 'supabase'}
 top_k_results: 4
-date_start: 2017/01/01
-date_end: 2019/12/31
+date_start: 2015/01/01
+date_end: 2015/01/02
 
 # Prompts
 prompt_system_old_0: |

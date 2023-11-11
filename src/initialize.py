@@ -160,9 +160,7 @@ def _init_retrieval_qa_llm(vector_store, config_loader):
         chain_type="stuff",
         return_source_documents=True,
         retriever=retriever,
-        chain_type_kwargs={
-            "prompt": ChatPromptTemplate.from_messages(messages)
-        },
+        chain_type_kwargs={"prompt": ChatPromptTemplate.from_messages(messages)},
     )
     logger.info(retrieval_qa.combine_documents_chain.llm_chain.prompt.format)
     logger.info("Initialized RetrievalQA LLM")

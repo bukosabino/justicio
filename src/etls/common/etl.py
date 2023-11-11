@@ -7,7 +7,8 @@ from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from retry import retry
 
-from src.etls.utils import BOEMetadataDocument, BOETextLoader
+from src.etls.common.metadata import MetadataDocument
+from src.etls.common.utils import TextLoader
 from src.initialize import initialize_logging
 
 initialize_logging()
@@ -18,12 +19,12 @@ class ETL:
         self._config_loader = config_loader
         self._vector_store = vector_store
 
-    def run(self, docs: tp.List[BOEMetadataDocument]):
+    def run(self, docs: tp.List[MetadataDocument]):
         chunks = self._split_documents(docs)
         self._load_database(chunks)
         # self._log_database_stats()
 
-    def _split_documents(self, docs: tp.List[BOEMetadataDocument]) -> tp.List[Document]:
+    def _split_documents(self, docs: tp.List[MetadataDocument]) -> tp.List[Document]:
         """Split documents by chunks
 
         :param docs:
@@ -33,7 +34,7 @@ class ETL:
         logger.info("Splitting in chunks %s documents", len(docs))
         docs_chunks = []
         for doc in docs:
-            loader = BOETextLoader(file_path=doc.filepath, metadata=doc.dict())
+            loader = TextLoader(file_path=doc.filepath, metadata=doc.dict())
             documents = loader.load()
             text_splitter = RecursiveCharacterTextSplitter(
                 chunk_size=self._config_loader["chunk_size"],

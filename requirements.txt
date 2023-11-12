@@ -17,7 +17,7 @@ qdrant-client==1.5.4
 supabase==1.0.2
 pinecone-client==2.2.2
 sentence_transformers==2.2.2
-openai==0.27.8
+openai==1.2.3
 
 sendgrid==6.10.0
 

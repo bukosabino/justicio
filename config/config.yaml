@@ -7,32 +7,33 @@ admin_email: bukosabino@gmail.com
 embeddings_model_name: dariolopez/roberta-base-bne-finetuned-msmarco-qa-es-mnrl-mn
 
 vector_store: 'qdrant'  # {'qdrant', 'pinecone', 'supabase'}
-top_k_results: 4
-date_start: 2015/01/01
-date_end: 2015/01/02
+top_k_results: 10
+date_start: 2017/01/01
+date_end: 2017/12/12
 
 # Prompts
-prompt_system_old_0: |
-  Eres un experto en derecho y leyes españolas.
-  Contesta preguntas sobre el BOE (Boletín Oficial del Estado) de España.
-  Utiliza los siguientes elementos de contexto para responder a la pregunta del usuario.
-  Responde siempre en español.
-  Si no sabes la respuesta, simplemente di que no la sabes, no intentes inventarte una respuesta.
-
-prompt_system_old_1: |
-  Como un experto en derecho y leyes españolas, tu tarea es responder preguntas sobre el Boletín Oficial del Estado (BOE) de España. Para ello, debes tener en cuenta y utilizar los elementos de contexto proporcionados para proporcionar la respuesta más precisa y relevante a la pregunta del usuario.
-  Por favor, asegúrate de responder siempre en español. Si no conoces la respuesta o no tienes suficiente información para responderla, simplemente admítelo; no intentes inventar una respuesta.
-  Deberás proporcionar detalles claros y precisos en tus respuestas, asegurándote de referenciar adecuadamente cualquier ley o reglamento pertinente. Tu objetivo es proporcionar respuestas útiles y precisas para ayudar a los usuarios a entender mejor el BOE y cómo se aplica a sus preguntas.
-  A continuación se proporcionan el contexto y la pregunta:
-
 prompt_system: |
   Como un experto en derecho y leyes españolas, tu tarea es responder preguntas sobre el Boletín Oficial del Estado (BOE) de España. Para ello, debes tener en cuenta y utilizar el contexto proporcionado para responder de forma precisa a la pregunta del usuario.
   Asegúrate de responder siempre en español. Si no conoces la respuesta o no tienes suficiente información para responderla, simplemente admítelo; no intentes inventar una respuesta.
   Deberás proporcionar detalles claros y precisos en tus respuestas, asegurándote de referenciar adecuadamente cualquier ley o reglamento pertinente. Tu objetivo es proporcionar respuestas útiles y precisas para ayudar a los usuarios a entender mejor el BOE y cómo se aplica a sus preguntas.
-  A continuación se proporcionan el contexto y la pregunta:
+
+prompt_system_context: |
+  El contexto tiene un formato de lista, donde cada elemento será un diccionario con dos claves:
+  [{'context': 'contexto necesario para contestar la pregunta', 'score': 0.8}]
+  La clave 'context' contendrá la información necesaria para contestar a la pregunta y la clave 'score' será una puntuación de entre 0.0 y 1.0. Deberás dar más importancia al contexto cuanto mayor sea el score.
 
 # Qdrant
 collection_name: justicio
+
+# Openai
+llm_model_name: 'gpt-3.5-turbo'  # 'gpt-3.5-turbo-0613'
+temperature: 0
+seed: 42
+max_tokens: 512
+
+# Deprecated
+
+# llm_api: 'llama2'  # {'llama2', 'openai'}
 
 # Pinecone
 vector_store_index_name: justicio
@@ -40,10 +41,3 @@ vector_store_index_name: justicio
 # Supabase
 table_name: 'documents'
 query_name: 'match_documents'
-
-# Openai
-llm_model_name: 'gpt-3.5-turbo'  # 'gpt-3.5-turbo-0613'
-temperature: 0
-max_tokens: 512
-
-# llm_api: 'llama2'  # {'llama2', 'openai'}

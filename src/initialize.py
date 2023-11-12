@@ -14,10 +14,10 @@ from langchain.prompts import (
 )
 from langchain.vectorstores.pinecone import Pinecone
 from langchain.vectorstores.qdrant import Qdrant
+from openai import AsyncOpenAI
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams
 from supabase.client import Client, create_client
-from openai import AsyncOpenAI
 
 from src.utils import StandardSupabaseVectorStore
 
@@ -45,7 +45,6 @@ def initialize_app():
     vector_store = _init_vector_store(config_loader)
     openai_client = _init_openai_client()
     # retrieval_qa = _init_retrieval_qa_llm(vector_store, config_loader)
-    # embedding_encoder = tiktoken.encoding_for_model(config_loader['llm_model_name'])
     logger.info("Initialized application")
     init_objects = collections.namedtuple(
         "init_objects", ["config_loader", "vector_store", "openai_client"]

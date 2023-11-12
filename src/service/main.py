@@ -60,20 +60,28 @@ async def qa(input_query: str = DEFAULT_INPUT_QUERY):
     )
 
     # Generate response using a LLM (OpenAI)
-    context_preprocessed = [{'context': doc[0].page_content, 'score': doc[1]} for doc in docs]
+    context_preprocessed = [
+        {"context": doc[0].page_content, "score": doc[1]} for doc in docs
+    ]
     response = await INIT_OBJECTS.openai_client.chat.completions.create(
-        model=INIT_OBJECTS.config_loader['llm_model_name'],
+        model=INIT_OBJECTS.config_loader["llm_model_name"],
         messages=[
-            {"role": "system", "content": INIT_OBJECTS.config_loader['prompt_system']},
-            {"role": "system", "content": INIT_OBJECTS.config_loader['prompt_system_context']},
+            {"role": "system", "content": INIT_OBJECTS.config_loader["prompt_system"]},
+            {
+                "role": "system",
+                "content": INIT_OBJECTS.config_loader["prompt_system_context"],
+            },
             {"role": "system", "content": "A continuación se proporciona el contexto:"},
             {"role": "system", "content": str(context_preprocessed)},
-            {"role": "system", "content": "A continuación se proporciona la pregunta del usuario:"},
-            {"role": "user", "content": input_query}
+            {
+                "role": "system",
+                "content": "A continuación se proporciona la pregunta del usuario:",
+            },
+            {"role": "user", "content": input_query},
         ],
-        temperature=INIT_OBJECTS.config_loader['temperature'],
-        seed=INIT_OBJECTS.config_loader['seed'],
-        max_tokens=INIT_OBJECTS.config_loader['max_tokens']
+        temperature=INIT_OBJECTS.config_loader["temperature"],
+        seed=INIT_OBJECTS.config_loader["seed"],
+        max_tokens=INIT_OBJECTS.config_loader["max_tokens"],
     )
     answer = response.choices[0].message.content
     logger.info(answer)

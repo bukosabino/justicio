@@ -17,6 +17,7 @@ from langchain.vectorstores.qdrant import Qdrant
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams
 from supabase.client import Client, create_client
+from openai import AsyncOpenAI
 
 from src.utils import StandardSupabaseVectorStore
 
@@ -42,12 +43,14 @@ def initialize_app():
     logger.info("Initializing application")
     config_loader = _init_config()
     vector_store = _init_vector_store(config_loader)
-    retrieval_qa = _init_retrieval_qa_llm(vector_store, config_loader)
+    openai_client = _init_openai_client()
+    # retrieval_qa = _init_retrieval_qa_llm(vector_store, config_loader)
+    # embedding_encoder = tiktoken.encoding_for_model(config_loader['llm_model_name'])
     logger.info("Initialized application")
     init_objects = collections.namedtuple(
-        "init_objects", ["config_loader", "vector_store", "retrieval_qa"]
+        "init_objects", ["config_loader", "vector_store", "openai_client"]
     )
-    return init_objects(config_loader, vector_store, retrieval_qa)
+    return init_objects(config_loader, vector_store, openai_client)
 
 
 def _init_config():
@@ -140,7 +143,18 @@ def _init_vector_store_qdrant(config_loader):
     return vector_store
 
 
+def _init_openai_client():
+    logger = lg.getLogger(_init_retrieval_qa_llm.__name__)
+    logger.info("Initializing OpenAI client")
+    client = AsyncOpenAI(
+        api_key=os.environ.get("OPENAI_API_KEY"),
+    )
+    logger.info("Initialized OpenAI client")
+    return client
+
+
 def _init_retrieval_qa_llm(vector_store, config_loader):
+    # DEPRECATED
     logger = lg.getLogger(_init_retrieval_qa_llm.__name__)
     logger.info("Initializing RetrievalQA LLM")
     retriever = vector_store.as_retriever(

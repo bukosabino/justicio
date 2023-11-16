@@ -8,8 +8,8 @@ embeddings_model_name: dariolopez/roberta-base-bne-finetuned-msmarco-qa-es-mnrl-
 
 vector_store: 'qdrant'  # {'qdrant', 'pinecone', 'supabase'}
 top_k_results: 10
-date_start: 2017/01/01
-date_end: 2017/12/12
+date_start: 2000/01/01
+date_end: 2004/12/12
 
 # Prompts
 prompt_system: |
@@ -26,7 +26,7 @@ prompt_system_context: |
 collection_name: justicio
 
 # Openai
-llm_model_name: 'gpt-3.5-turbo'  # 'gpt-3.5-turbo-0613'
+llm_model_name: 'gpt-4-1106-preview'  # 'gpt-3.5-turbo'
 temperature: 0
 seed: 42
 max_tokens: 512

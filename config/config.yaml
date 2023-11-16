@@ -21,6 +21,7 @@ prompt_system_context: |
   El contexto tiene un formato de lista, donde cada elemento será un diccionario con dos claves:
   [{'context': 'contexto necesario para contestar la pregunta', 'score': 0.8}]
   La clave 'context' contendrá la información necesaria para contestar a la pregunta y la clave 'score' será una puntuación de entre 0.0 y 1.0. Deberás dar más importancia al contexto cuanto mayor sea el score.
+  En la respuesta no menciones nada sobre el contexto o los scores.
 
 # Qdrant
 collection_name: justicio

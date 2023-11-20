@@ -71,8 +71,9 @@ the most similar documents returned by the embedding database.
 - Langchain
 - FastAPI
 - Qdrant
+- OpenAI API (gpt-4-1106-preview)
+- [Fine tuned Spanish SBert model](https://github.com/bukosabino/sbert-spanish)
 - BeautifulSoup
-- gpt-4-1106-preview (OpenAI)
 
 # Deploy your own service
 

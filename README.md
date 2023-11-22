@@ -13,9 +13,9 @@ query using the embedded question. The retrieved pieces of text are then sent to
 
 # Service
 
-At this moment we are running a user-free service: Justicio(https://justicio.es/)
+At this moment we are running a user-free service: [Justicio](https://justicio.es/)
 
-You can try it for free!
+You can test it without charge! Please, give us your feedback if you have!
 
 # How it works under the hood
 

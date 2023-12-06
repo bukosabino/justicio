@@ -18,6 +18,7 @@ supabase==1.0.2
 pinecone-client==2.2.2
 sentence_transformers==2.2.2
 openai==1.2.3
+tavily-python==0.2.6
 
 sendgrid==6.10.0
 

@@ -11,4 +11,4 @@ export QDRANT_API_URL="<your_supabase_api_url>"
 cd ia-boe/
 source venv3.9/bin/activate
 pip install -r requirements.txt
-python -m src.etls.etl_daily
+python -m src.etls.boe.load.daily

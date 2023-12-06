@@ -18,6 +18,7 @@ from openai import AsyncOpenAI
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams
 from supabase.client import Client, create_client
+from tavily import TavilyClient
 
 from src.utils import StandardSupabaseVectorStore
 
@@ -44,12 +45,13 @@ def initialize_app():
     config_loader = _init_config()
     vector_store = _init_vector_store(config_loader)
     openai_client = _init_openai_client()
+    tavily_client = TavilyClient(api_key=os.environ['TAVILY_API_KEY'])
     # retrieval_qa = _init_retrieval_qa_llm(vector_store, config_loader)
     logger.info("Initialized application")
     init_objects = collections.namedtuple(
-        "init_objects", ["config_loader", "vector_store", "openai_client"]
+        "init_objects", ["config_loader", "vector_store", "openai_client", "tavily_client"]
     )
-    return init_objects(config_loader, vector_store, openai_client)
+    return init_objects(config_loader, vector_store, openai_client, tavily_client)
 
 
 def _init_config():

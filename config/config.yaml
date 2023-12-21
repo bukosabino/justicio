@@ -27,10 +27,10 @@ prompt_system_context: |
 collection_name: justicio
 
 # Openai
-llm_model_name: 'gpt-4-1106-preview'  # 'gpt-3.5-turbo'
+llm_model_name: 'gpt-3.5-turbo-1106'  # 'gpt-4-1106-preview'
 temperature: 0
 seed: 42
-max_tokens: 512
+max_tokens: 1024
 
 # Deprecated
 

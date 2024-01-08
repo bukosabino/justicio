@@ -101,3 +101,4 @@ You are welcome! Please, contact us to see how you can help.
 
 * [Darío López](https://www.linkedin.com/in/dar%C3%ADo-l%C3%B3pez-padial-45269150/) 
 * [Alex Dantart](https://www.linkedin.com/in/dantart/)
+* [Jorge Iliarte](https://www.linkedin.com/in/jorge-iliarte-llop/)

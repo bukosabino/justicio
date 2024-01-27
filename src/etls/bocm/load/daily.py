@@ -23,4 +23,4 @@ if __name__ == "__main__":
     - Documents loaded: {len(docs)} 
     - Database used: {INIT_OBJECTS.config_loader['vector_store']}
     """
-    #send_email(INIT_OBJECTS.config_loader, subject, content)
+    send_email(INIT_OBJECTS.config_loader, subject, content)

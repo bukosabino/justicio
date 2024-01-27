@@ -124,7 +124,7 @@ def _init_vector_store_qdrant(config_loader):
     logger.info("Initializing vector store")
     qdrant_client = QdrantClient(
         url=os.environ["QDRANT_API_URL"],
-        #api_key=os.environ["QDRANT_API_KEY"],
+        api_key=os.environ["QDRANT_API_KEY"],
         prefer_grpc=True,
     )
 

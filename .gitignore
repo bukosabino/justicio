@@ -1,3 +1,10 @@
+# Nix
+shell.nix
+
+# Justicio 
+qdrant_storage/
+logs/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

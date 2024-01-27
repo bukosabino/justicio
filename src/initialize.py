@@ -124,24 +124,39 @@ def _init_vector_store_qdrant(config_loader):
     logger.info("Initializing vector store")
     qdrant_client = QdrantClient(
         url=os.environ["QDRANT_API_URL"],
-        api_key=os.environ["QDRANT_API_KEY"],
+        #api_key=os.environ["QDRANT_API_KEY"],
         prefer_grpc=True,
     )
+
     embeddings = HuggingFaceEmbeddings(
         model_name=config_loader["embeddings_model_name"],
         model_kwargs={"device": "cpu"},
     )
-    if len(qdrant_client.get_collections().collections) == 0:
+
+    # Check if collection exists
+
+    #if len(qdrant_client.get_collections().collections) == 0:
+    if (not _collection_exists(qdrant_client,config_loader)):
         logger.info("Creating collection for vector store")
         qdrant_client.recreate_collection(
             collection_name=config_loader["collection_name"],
             vectors_config=VectorParams(size=768, distance=Distance.COSINE),
             on_disk_payload=True,
         )
-        logger.info("Created collection for vector store")
+        logger.info("Created collection [%s] for vector store", config_loader["collection_name"] )
     vector_store = Qdrant(qdrant_client, config_loader["collection_name"], embeddings)
     logger.info("Initialized vector store")
     return vector_store
+
+def _collection_exists(client, config_loader):
+    logger = lg.getLogger(_collection_exists.__name__)
+    try:
+        client.get_collection(collection_name=config_loader["collection_name"])
+        result = True
+    except:
+        logger.warn("Collection [%s] doesn't exist", config_loader["collection_name"])
+        result = False    
+    return result
 
 
 def _init_openai_client():

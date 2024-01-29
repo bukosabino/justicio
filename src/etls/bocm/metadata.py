@@ -21,7 +21,7 @@ class BOCMMetadataDocument(MetadataDocument):
     source_type: str = "Boletin"
 
     # Metadatos
-    identificador: str # CVE
+    identificador: str = Field(pattern=CVE_REGEX, examples=['BOCM-20240129-24'])
     numero_oficial: str = "" # Número de boletín
     departamento: str # órgano (excepto sección 4, que no tiene)
     seccion: str # sección

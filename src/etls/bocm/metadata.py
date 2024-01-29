@@ -47,9 +47,3 @@ class BOCMMetadataDocument(MetadataDocument):
             return datetime.strptime(v, "%Y-%m-%d").strftime("%Y-%m-%d")
         return v
 
-    @field_validator("identificador")
-    @classmethod
-    def cve(cls, v):
-        if not re.fullmatch(CVE_REGEX, v): 
-            raise ValueError(f"{v} is not a valid CVE")
-        return v

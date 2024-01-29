@@ -145,7 +145,7 @@ def _init_vector_store_qdrant(config_loader):
 
 
 def _init_openai_client():
-    logger = lg.getLogger(_init_retrieval_qa_llm.__name__)
+    logger = lg.getLogger(_init_openai_client.__name__)
     logger.info("Initializing OpenAI client")
     client = AsyncOpenAI(
         api_key=os.environ.get("OPENAI_API_KEY"),

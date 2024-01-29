@@ -24,6 +24,7 @@ class BOEMetadataDocument(MetadataDocument):
 
     # Metadatos
     identificador: str
+    diario: str
     numero_oficial: str = ""
     departamento: str
     rango: str = ""

@@ -18,9 +18,11 @@ def _extract_metadata(soup) -> tp.Dict:
     metadata_dict = {}
 
     # Metadatos
-    identificador = soup.documento.metadatos.identificador
-    if identificador:
+    if identificador := soup.documento.metadatos.identificador:
         metadata_dict["identificador"] = identificador.get_text()
+
+    if diario := soup.documento.metadatos.diario:
+        metadata_dict["diario"] = diario.get_text()
 
     if numero_oficial := soup.documento.metadatos.numero_oficial:
         metadata_dict["numero_oficial"] = numero_oficial.get_text()
@@ -121,7 +123,7 @@ def _list_links_day(url: str) -> tp.List[str]:
         for section in soup.find_all(
             lambda tag: tag.name == "seccion"
             and "num" in tag.attrs
-            and (tag.attrs["num"] == "1" or tag.attrs["num"] == "T")
+            and (tag.attrs["num"] == "1" or tag.attrs["num"] == "T")  # Note: Sección 1 and Tribunal Supremo
         )
         for url in section.find_all("urlxml")
     ]

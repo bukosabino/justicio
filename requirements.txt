@@ -25,3 +25,6 @@ sendgrid==6.10.0
 # Clean code tools
 black==23.9.1
 isort==5.12.0
+
+# Evaluation
+ragas==0.1.0rc1

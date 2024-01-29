@@ -135,8 +135,7 @@ def _init_vector_store_qdrant(config_loader):
 
     # Check if collection exists
 
-    #if len(qdrant_client.get_collections().collections) == 0:
-    if (not _collection_exists(qdrant_client,config_loader)):
+    if not _collection_exists(qdrant_client, config_loader):
         logger.info("Creating collection for vector store")
         qdrant_client.recreate_collection(
             collection_name=config_loader["collection_name"],

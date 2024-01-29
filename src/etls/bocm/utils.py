@@ -112,7 +112,7 @@ def _normalize_section_from_title(title) -> str:
     arr = list(map(lambda s: s.strip(), words_arr))
     normalized = f'{SECTIONS[arr[1][0:4]]}-'
     if (len(arr) > 2 and normalized == '1-'):
-        normalized = f'{normalized}-{APARTADOS[arr[2][0:2]]}'
+        normalized = f'{normalized}{APARTADOS[arr[2][0:2]]}'
     
     return normalized 
 

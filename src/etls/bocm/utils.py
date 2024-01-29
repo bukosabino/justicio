@@ -3,27 +3,6 @@ import logging as lg
 import re
 from src.initialize import initialize_logging
 
-"""
-- Estructura del BOCM : https://www.bocm.es/estructura
-- Normativa: https://www.bocm.es/normativa-reguladora
-- Portal de Legislación : https://gestiona.comunidad.madrid/wleg_pub/secure/busquedaAvanzada/buscador.jsf?id=1
-
-RESUMEN:  (x = Tiene ese campo)
-| SECCIÓN | APARTADO | RANGO | ÓRGANO EMISOR | ANUNCIANTE |
-| ------- | -------- | ----- | ------------- | ---------- |
-|       1 | x        | x     | x             |            |
-|       2 |          | x     |               |            |
-|       3 | x        |       | x             |            |
-|       4 | x        |       |               |            |
-|       5 |          |       |               | x          |
-
-
-NOTAS:
-- Añadir una sección de análisis en los metadatos, cruzando info con el portal de legislación
-
-"""
-
-
 BOCM_PREFIX = 'https://www.bocm.es'
 
 SECTIONS = {

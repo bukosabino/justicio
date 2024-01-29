@@ -51,6 +51,7 @@ def _get_summary_link_from_date(day: date) -> str:
     
     except HTTPError:
             logger.error("No link got on day %s", day)
+            final_url = None
     
     except ValueError as err:
             logger.error("%s for day %s. Skiping...", err.args[0],day)

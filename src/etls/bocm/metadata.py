@@ -1,7 +1,7 @@
 import typing as tp
 from datetime import datetime
 
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, field_validator, Field
 import re
 
 from src.etls.common.metadata import MetadataDocument

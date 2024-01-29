@@ -46,16 +46,13 @@ data_post = {
 	'contenido': ''
 }
 
-def _extract_span_text(row, text_label):
+def _extract_span_text(row: bs4.element.Tag, text_label: str) -> str:
         """
         Extracts the text of the next sibling for a span element that contains the specified text_label.
         
-        Parameters:
-        row (bs4.element.Tag): The BeautifulSoup row element to search within.
-        text_label (str): The text to search for within the span element.
-        
-        Returns:
-        str: The stripped text of the next sibling if found, otherwise an empty string.
+        :param row: The BeautifulSoup row element to search within.
+        :param text_label: The text to search for within the span element.
+        :return: The stripped text of the next sibling if found, otherwise an empty string.
         """
         span_element = row.find('span', string=lambda t: text_label in t)
         return span_element.next_sibling.strip() if span_element and span_element.next_sibling else None

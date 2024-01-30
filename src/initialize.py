@@ -16,7 +16,7 @@ from langchain.vectorstores.pinecone import Pinecone
 from langchain.vectorstores.qdrant import Qdrant
 from openai import AsyncOpenAI
 from qdrant_client import QdrantClient
-from qdrant_client.models import Distance, VectorParams
+from qdrant_client.models import VectorParams
 from supabase.client import Client, create_client
 from tavily import TavilyClient
 
@@ -69,7 +69,7 @@ def _init_vector_store(config_loader):
     elif config_loader["vector_store"] == "supabase":
         vector_store = _init_vector_store_supabase(config_loader)
     elif config_loader["vector_store"] == "qdrant":
-        vector_store = _init_vector_store_qdrant(config_loader)
+        vector_store = _init_vector_stores_qdrant(config_loader)
     else:
         raise ValueError("Vector Database not configured")
     return vector_store
@@ -119,9 +119,9 @@ def _init_vector_store_supabase(config_loader):
     return vector_store
 
 
-def _init_vector_store_qdrant(config_loader):
-    logger = lg.getLogger(_init_vector_store_qdrant.__name__)
-    logger.info("Initializing vector store")
+def _init_vector_stores_qdrant(config_loader):
+    logger = lg.getLogger(_init_vector_stores_qdrant.__name__)
+    logger.info("Initializing vector stores")
     qdrant_client = QdrantClient(
         url=os.environ["QDRANT_API_URL"],
         api_key=os.environ["QDRANT_API_KEY"],
@@ -131,17 +131,21 @@ def _init_vector_store_qdrant(config_loader):
         model_name=config_loader["embeddings_model_name"],
         model_kwargs={"device": "cpu"},
     )
-    if len(qdrant_client.get_collections().collections) == 0:
-        logger.info("Creating collection for vector store")
-        qdrant_client.recreate_collection(
-            collection_name=config_loader["collection_name"],
-            vectors_config=VectorParams(size=768, distance=Distance.COSINE),
-            on_disk_payload=True,
-        )
-        logger.info("Created collection for vector store")
-    vector_store = Qdrant(qdrant_client, config_loader["collection_name"], embeddings)
-    logger.info("Initialized vector store")
-    return vector_store
+    vector_stores = {}
+    for collection_name in config_loader["collections"]:
+        if not _exists_collection(qdrant_client, collection_name):
+            logger.info("Creating collection for vector store")
+            qdrant_client.recreate_collection(
+                collection_name=collection_name,
+                vectors_config=VectorParams(
+                    size=config_loader['embeddings_model_size'], distance=config_loader['distance_type']
+                ),
+                on_disk_payload=True,
+            )
+            logger.info("Created collection [%s] for vector store", collection_name)
+        vector_stores[collection_name] = Qdrant(qdrant_client, collection_name, embeddings)
+        logger.info("Initialized vector store for collection [%s]", collection_name)
+    return vector_stores
 
 
 def _init_openai_client():
@@ -152,6 +156,16 @@ def _init_openai_client():
     )
     logger.info("Initialized OpenAI client")
     return client
+
+
+def _exists_collection(client, collection_name):
+    logger = lg.getLogger(_exists_collection.__name__)
+    try:
+        client.get_collection(collection_name=collection_name)
+        return True
+    except:
+        logger.warn("Collection [%s] doesn't exist", collection_name)
+        return False
 
 
 def _init_retrieval_qa_llm(vector_store, config_loader):

@@ -5,11 +5,14 @@ chunk_overlap: 100
 admin_email: bukosabino@gmail.com
 
 embeddings_model_name: dariolopez/roberta-base-bne-finetuned-msmarco-qa-es-mnrl-mn
+embeddings_model_size: 768
 
 vector_store: 'qdrant'  # {'qdrant', 'pinecone', 'supabase'}
 top_k_results: 10
-date_start: 2000/01/01
-date_end: 2004/12/12
+distance_type: 'Cosine'  # {'Cosine', 'Euclid', 'Dot'}
+
+# date_start: 2000/01/01
+# date_end: 2004/12/12
 
 # Prompts
 prompt_system: |
@@ -24,7 +27,10 @@ prompt_system_context: |
   En la respuesta no menciones nada sobre el contexto o los scores.
 
 # Qdrant
-collection_name: justicio
+collections:
+  - justicio
+  - bocm
+  - bopz
 
 # Openai
 llm_model_name: 'gpt-3.5-turbo-1106'  # 'gpt-4-1106-preview'
@@ -32,13 +38,9 @@ temperature: 0
 seed: 42
 max_tokens: 1024
 
-# Deprecated
-
-# llm_api: 'llama2'  # {'llama2', 'openai'}
-
-# Pinecone
+# Not used
+## Pinecone
 vector_store_index_name: justicio
-
-# Supabase
+## Supabase
 table_name: 'documents'
 query_name: 'match_documents'

@@ -11,9 +11,6 @@ vector_store: 'qdrant'  # {'qdrant', 'pinecone', 'supabase'}
 top_k_results: 10
 distance_type: 'Cosine'  # {'Cosine', 'Euclid', 'Dot'}
 
-# date_start: 2000/01/01
-# date_end: 2004/12/12
-
 # Prompts
 prompt_system: |
   Como un experto en derecho y leyes españolas, tu tarea es responder preguntas sobre el Boletín Oficial del Estado (BOE) de España. Para ello, debes tener en cuenta y utilizar el contexto proporcionado para responder de forma precisa a la pregunta del usuario.

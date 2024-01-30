@@ -68,7 +68,7 @@ async def a_request_get(url):
 
 @APP.get("/qa")
 @timeit
-async def qa(input_query: str = DEFAULT_INPUT_QUERY, collection_name: str = DEFAULT_COLLECTION_NAME, model: str = INIT_OBJECTS.config_loader["llm_model_name"]):
+async def qa(input_query: str = DEFAULT_INPUT_QUERY, collection_name: str = DEFAULT_COLLECTION_NAME, model_name: str = INIT_OBJECTS.config_loader["llm_model_name"]):
     logger = lg.getLogger(qa.__name__)
     logger.info(input_query)
 
@@ -97,7 +97,7 @@ async def qa(input_query: str = DEFAULT_INPUT_QUERY, collection_name: str = DEFA
     ]
     # logger.info(messages)
     response = await INIT_OBJECTS.openai_client.chat.completions.create(
-        model=model,
+        model=model_name,
         messages=messages,
         temperature=INIT_OBJECTS.config_loader["temperature"],
         seed=INIT_OBJECTS.config_loader["seed"],

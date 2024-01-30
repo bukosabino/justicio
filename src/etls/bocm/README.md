@@ -15,13 +15,13 @@
 # Clasificación de campos que contiene cada sección del BOCM
 
 
-| SECCIÓN | APARTADO | RANGO | ÓRGANO EMISOR | ANUNCIANTE |
-| ------- | -------- | ----- | ------------- | ---------- |
-|       1 | x        | x     | x             |            |
-|       2 |          | x     |               |            |
-|       3 | x        |       | x             |            |
-|       4 | x        |       |               |            |
-|       5 |          |       |               | x          |
+SECCIÓN | SUBSECCIÓN | APARTADO | TIPO | ANUNCIANTE | RANGO | ORGANO
+:---:|:---:|:---:|:---:|:---:|:---:|:---:
+ 1 | x | | x | | x | x
+ 2 | x | | | | | |
+ 3 | x| x | | | | |
+ 4 | x| | | | | |
+ 5 |  | | | x | | |
 
 > NOTA ACLARATORIA:  (x = Tiene ese campo)
 

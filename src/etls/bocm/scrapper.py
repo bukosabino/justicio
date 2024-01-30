@@ -39,8 +39,7 @@ def _get_summary_link_from_date(day: date) -> str:
     
     search_url = 'https://www.bocm.es/search-day-month'
 
-    try:
-        
+    try:       
         response = requests.post(search_url, data={ 'field_date[date]' : day})
         response.raise_for_status()
         link = response.headers['Link'].split(';')[0].replace("<","").replace(">","")
@@ -65,28 +64,35 @@ def _extract_metadata(soup) -> tp.Dict:
 
     # Metadata from head tags
     fecha_publicacion,cve,html_link = metadata_from_head_tags(soup)
-
-    # Metadata from document header   
-    departamento,seccion,apartado,rango,organo,anunciante = metadata_from_doc_header(soup,cve)
-
+    
     # Desc doc header
-    numero_oficial,seccion_full,paginas,pdf_link = metadata_from_doc_desc_header(soup)
+    numero_oficial,seccion_normalizada,paginas,pdf_link = metadata_from_doc_header(soup)
 
-    metadata_dict["departamento"] = departamento
+    # Metadata from document 
+    seccion = seccion_normalizada.split('.')[0]
+    subseccion,apartado,tipo,organo,anunciante,rango = metadata_from_doc(soup,seccion,cve)
+
+    metadata_dict["rango"] = rango
     metadata_dict["identificador"] = cve
+    metadata_dict["numero_oficial"] = numero_oficial
+    metadata_dict["paginas"] = paginas
+    
+    # departamento always match with organo
+    metadata_dict["departamento"] = organo
+    
+    metadata_dict["seccion_normalizada"] = seccion_normalizada
+    metadata_dict["seccion"] = seccion.upper()
+    metadata_dict["subseccion"] = subseccion
+    metadata_dict["tipo"] = tipo
+    metadata_dict["apartado"] = apartado
+  
     metadata_dict["titulo"] = cve
+    metadata_dict["url_pdf"] = pdf_link
     metadata_dict["url_html"] = html_link
+
     metadata_dict["fecha_publicacion"] = fecha_publicacion
     metadata_dict["fecha_disposicion"] = fecha_publicacion
-    metadata_dict["numero_oficial"] = numero_oficial
-    metadata_dict["seccion_full"] = seccion_full
-    metadata_dict["paginas"] = paginas
-    metadata_dict["url_pdf"] = pdf_link
-    metadata_dict["seccion"] = seccion.upper()
-    metadata_dict["origen_legislativo"] =  get_origen_legislativo_by_seccion(seccion)
-    metadata_dict["apartado"] = apartado
-    metadata_dict["rango"] = rango
-    
+        
     metadata_dict["anio"] = datetime.strptime(
         fecha_publicacion, "%Y-%m-%d"
     ).strftime("%Y")
@@ -113,7 +119,7 @@ def _list_links_day(url: str) -> tp.List[str]:
     logger.info("Scrapping day: %s", url)
     response = requests.get(url)
     response.raise_for_status()
-    soup = BeautifulSoup(response.text, "lxml")
+    soup = BeautifulSoup(response.text,features="lxml")
 
     # filter by sections
     sections_to_filter = ['1-A','3-','4-']
@@ -170,10 +176,11 @@ class BOCMScrapper(BaseScrapper):
         logger.info("Scrapping document: %s", url)
         response = requests.get(url)
         response.raise_for_status()
-        soup = BeautifulSoup(response.text, "lxml")
+        soup = BeautifulSoup(response.text,features="lxml")
         with tempfile.NamedTemporaryFile("w", delete=False) as fn:
             text = soup.select_one("#main").get_text()
-            fn.write(text)
+            text_cleaned = clean_text(text)
+            fn.write(text_cleaned)
         metadata_doc = BOCMMetadataDocument(filepath=fn.name, **_extract_metadata(soup))
         logger.info("Scrapped document successfully %s", url)
         return metadata_doc

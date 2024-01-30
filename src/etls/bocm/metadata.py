@@ -7,8 +7,9 @@ import re
 from src.etls.common.metadata import MetadataDocument
 
 
-# TODO: regex demasiado laxa
-CVE_REGEX = r'^BOCM-\d{8}-\d{1,3}$'
+# REGEX
+CVE_REGEX = r'^BOCM-\d{8}-\d{1,3}$' # TODO: regex demasiado laxa
+
 
 class BOCMMetadataDocument(MetadataDocument):
     """Class for keeping metadata of a BOCM Document scrapped."""
@@ -23,20 +24,29 @@ class BOCMMetadataDocument(MetadataDocument):
     # Metadatos
     identificador: str = Field(pattern=CVE_REGEX, examples=['BOCM-20240129-24'])
     numero_oficial: str = "" # Número de boletín
+    paginas: str
     departamento: str # órgano (excepto sección 4, que no tiene)
-    seccion: str # sección
-    seccion_full: str
-    rango: str = "" # rango
+
+    
+    seccion_normalizada: str
+    seccion: str
+    subseccion: str
+    tipo: str = ""
+    apartado: str = ""
+    rango: str = ""
+
+    # Links   
     titulo: str # title
     url_pdf: str # pdf_link
     url_html: str # html_link
-    origen_legislativo: str = "" # En función de sección
+
+
     fecha_publicacion: str
     fecha_disposicion: str = ""
     anio: str
     mes: str
     dia: str
-    paginas: str
+
 
     datetime_insert: str = datetime.utcnow().isoformat()
 

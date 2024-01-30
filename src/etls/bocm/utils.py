@@ -5,28 +5,9 @@ from src.initialize import initialize_logging
 
 BOCM_PREFIX = 'https://www.bocm.es'
 
-SECTIONS = {
-    'i. c' : 1,
-    'ii. ' : 2,
-    'iii.' : 3,
-    'iv. ' : 4,
-    'v. o' : 5
-}
-APARTADOS = {
-    "a)" : "A",
-    "b)" : "B",
-    "c)" : "C",
-    "d)" : "D"
-}
-ORIGEN_LEGISLATIVO = {
-    1 : "REGIONAL",
-    2 : "ESTATAL",
-    3 : "MUNICIPAL",
-    4 : "JUSTICIA",
-    5 : "CCAA"
-}
 
 initialize_logging()
+
 
 def _get_url_from_cve(cve: str) -> str:
     return f'{BOCM_PREFIX}/{cve.lower()}'
@@ -42,101 +23,105 @@ def metadata_from_head_tags(soup) -> tp.List[str]:
 
 
 # Metadata from document header
-def metadata_from_doc_header(soup, cve: str) -> tp.List[str]:
-    logger = lg.getLogger(metadata_from_doc_header.__name__)
+def metadata_from_doc(soup, seccion: str, cve: str) -> tp.List[str]:
+    logger = lg.getLogger(metadata_from_doc.__name__)
     
-    seccion,*paras = [f.get_text().strip().lower() for f in soup.select('#cabeceras #cabeceras p')] 
-    current_seccion = SECTIONS[seccion[0:4]]
-
-    try:
-        if (current_seccion == 1 and len(paras) == 3):
-            apartado,r,organo = paras
-        elif (current_seccion == 3 and len(paras) == 3):
-            otro,apartado,organo = paras
-        elif (current_seccion == 3 and len(paras) == 2):
-            organo,apartado = paras
-            rango = ''
-        elif (current_seccion == 3 and len(paras) == 1):
-            organo = paras[0]
-            rango = ''
-            apartado = ''
-        elif (current_seccion == 4):
-            apartado = paras[0]
-            organo = ''
-        else:
-            organo,apartado = paras
-        
-        # TODO: section 5 will have value
-        anunciante = ''
-
-    except:
-        logger.error('Problem on section clasification for [%s]', cve)
-        logger.error('Please review [%s]',_get_url_from_cve(cve))
-
-    # Fix some inconsistencies of each section regarding rango field
+    # Set defaults
+    apartado,tipo,anunciante,organo,rango = ['','','','','']    
+    
+    # get headers
+    seccion_name,*paras = [f.get_text().strip().upper() for f in soup.select('#cabeceras #cabeceras p')] 
 
     # Metadata from article description
     desc = soup.select_one('meta[name="description"]')["content"]
     num_art = re.sub(r'BOCM-\d{8}-(\d{1,3})', r'\1' ,cve)
     
-    # Some articles don't have filled description needed for rango field extraction
-    if (len(desc) > 10 and current_seccion == 1):
-        # Using ASCII, doesn't work with re.UNICODE
-        rango = re.sub(r'^(\b[^\s]+\b)(.*)', r'\1', desc.split(num_art)[1], flags=re.ASCII).upper()
-    else:
-        rango = ''
+    try:
+        if seccion == '1':
+            subseccion_letter = ['A','B','C','D'][int(seccion) - 1]
+            subseccion_name,organo = paras
+            # Some articles don't have filled description needed for rango field extraction
+            if len(desc) > 10:
+                rango = re.sub(r'^(\b[^\s]+\b)(.*)', r'\1', desc.split(num_art)[1], flags=re.ASCII).upper()
+        if seccion == '2':
+            subseccion_name = 'DISPOSICIONES Y ANUNCIOS DEL ESTADO'
+            organo = paras[0]
+        if seccion == '3':
+            paras_num = len(paras)
+            subseccion_name = "ADMINISTRACIÓN LOCAL AYUNTAMIENTOS"
+            if paras_num == 3:
+                apartado,organo = paras[1:3]
+            elif paras_num == 2:
+                organo,apartado = paras[0:2]  
+            else:
+                apartado = 'MANCOMUNIDADES'
+                organo = paras[0]
 
-    if (current_seccion != 4):
-        departamento = organo.upper()
-    else:
-        departamento = ''
+        if seccion == '4':
+            subseccion_name = paras[0]
+        if seccion == '5':
+            subseccion_name = 'OTROS ANUNCIOS'
+            anunciante = paras[0]
+
+    except:
+        logger.error('Problem on section clasification for [%s]', cve)
+        logger.error('Please review [%s]',_get_url_from_cve(cve))
+
+    return [subseccion_name,apartado,tipo,organo,anunciante,rango]
 
 
-    return [departamento,seccion,apartado,rango,organo,anunciante]
+def metadata_from_doc_header(soup) -> tp.List[str]:
+    logger = lg.getLogger(metadata_from_doc_header.__name__)
 
-
-# Desc doc header
-def metadata_from_doc_desc_header(soup) -> tp.List[str]:
     numero_oficial = soup.select_one('.cabecera_popup h1 strong').get_text().split("-")[1].strip().split(" ")[1].strip()
-    s_field_a, cve_a, pags_a = [str.get_text().split(":") for str in soup.select('#titulo_cabecera h2')]
-    seccion_full = s_field_a[0].strip().split(' ')[1]
+    s_field_a, cve_a, pags_a, *permalink = [str.get_text().split(":") for str in soup.select('#titulo_cabecera h2')]
+    seccion_normalizada = s_field_a[0].strip().split(' ')[1]
     paginas = pags_a[1].strip()  # Should I convert to int??
     pdf_link = soup.select_one('#titulo_cabecera a')['href']
 
-    return [numero_oficial,seccion_full,paginas,pdf_link]
+    return [numero_oficial,seccion_normalizada,paginas,pdf_link]
 
-# Custom from BOCM
 
-def _normalize_section_from_title(title) -> str:
-    words_arr = re.sub(r'\</?strong\>',"",title).lower().replace(":", "|").split('|')
-    arr = list(map(lambda s: s.strip(), words_arr))
-    normalized = f'{SECTIONS[arr[1][0:4]]}-'
-    if (len(arr) > 2 and normalized == '1-'):
-        normalized = f'{normalized}{APARTADOS[arr[2][0:2]]}'
-    
-    return normalized 
+def select_section_from_id(soup,filtered_section: str) -> tp.List[str]:
+    logger = lg.getLogger(select_section_from_id.__name__)
+
+    section_links = []
+    section,subsection = filtered_section.split('-')
+    section_container = soup.select_one(f'div[id*="secciones-seccion_{section}"]')
+    if (section_container is not None):
+        if (len(subsection) == 1): 
+            if (section == '1'):
+                header_selector = '.view-grouping-header h3'
+                content_selector = '.view-grouping-content'           
+            else:
+                header_selector = '.view-content h3'
+                content_selector = '.view-content'
+            subsections = section_container.select('.view-grouping')
+            for group in subsections:
+                title = group.select_one(header_selector).text
+                subsection_fix = f'{subsection}\)'
+                if (re.search(subsection_fix, title)):
+                    links = [f'{BOCM_PREFIX}{a["href"]}' for a in group.select(f'{content_selector} a[href*="bocm-"]')]
+                    section_links += links           
+        else:
+            links = [f'{BOCM_PREFIX}{a["href"]}' for a in section_container.select('a[href*="bocm-"]')]
+            section_links += links
+    logger.info(f'Captured {len(section_links)} docs from section [{section}]');
+    return section_links
+
 
 def filter_links_by_section(soup,sections_filter_list: tp.List[str]) -> tp.List[str]:
     logger = lg.getLogger(filter_links_by_section.__name__)
 
-    sections = soup.select('div[id*="secciones-seccion"]')
     selected = []
-    for section in sections:
-        section_num = int(section["id"][-1])
-        if (section_num == 1):
-            header_selector = '.view-grouping-header h3'
-            content_selector = '.view-grouping-content'
-        else:
-            header_selector = '.view-content h3'
-            content_selector = '.view-content'
-        title_text = section.select_one(header_selector).text
-        normalized_section = _normalize_section_from_title(title_text)
-        if (normalized_section in sections_filter_list):
-            links = [f'{BOCM_PREFIX}{a["href"]}' for a in section.select('a[href*="bocm-"]')] 
-            selected += links
+    for section_id in sections_filter_list:
+        links = select_section_from_id(soup,section_id)
+        selected += links
     
     logger.info("Retrieved [%s] links for current day", len(selected))
     return selected
 
-def get_origen_legislativo_by_seccion(seccion: str) -> str:
-    return ORIGEN_LEGISLATIVO[SECTIONS[seccion[0:4]]]
+
+def clean_text(text: str) -> str:
+    cleaned = re.sub(r'(\xa0|\t+|\n+)', ' ',text, flags=re.MULTILINE)
+    return cleaned

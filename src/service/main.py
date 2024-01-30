@@ -19,7 +19,8 @@ DEFAULT_INPUT_QUERY = (
     "¿Es de aplicación la ley de garantía integral de la libertad sexual a niños (varones) menores de edad "
     "víctimas de violencias sexuales o solo a niñas y mujeres?"
 )
-DEFAULT_COLLECTION_NAME = 'justicio'
+DEFAULT_COLLECTION_NAME = "justicio"
+
 
 @APP.get("/healthcheck")
 @timeit
@@ -53,7 +54,7 @@ async def semantic_search_tavily(input_query: str = DEFAULT_INPUT_QUERY):
         max_results=10,
         topic="general",
         include_raw_content=False,
-        include_answer=False
+        include_answer=False,
     )
     logger.info(docs)
     return docs
@@ -68,7 +69,11 @@ async def a_request_get(url):
 
 @APP.get("/qa")
 @timeit
-async def qa(input_query: str = DEFAULT_INPUT_QUERY, collection_name: str = DEFAULT_COLLECTION_NAME, model_name: str = INIT_OBJECTS.config_loader["llm_model_name"]):
+async def qa(
+    input_query: str = DEFAULT_INPUT_QUERY,
+    collection_name: str = DEFAULT_COLLECTION_NAME,
+    model_name: str = INIT_OBJECTS.config_loader["llm_model_name"],
+):
     logger = lg.getLogger(qa.__name__)
     logger.info(input_query)
 
@@ -78,9 +83,7 @@ async def qa(input_query: str = DEFAULT_INPUT_QUERY, collection_name: str = DEFA
     )
 
     # Generate response using a LLM (OpenAI)
-    context_preprocessed = [
-        {"context": doc[0].page_content, "score": doc[1]} for doc in docs
-    ]
+    context_preprocessed = [{"context": doc[0].page_content, "score": doc[1]} for doc in docs]
     messages = [
         {"role": "system", "content": INIT_OBJECTS.config_loader["prompt_system"]},
         {
@@ -129,13 +132,11 @@ async def qa_tavily(input_query: str = DEFAULT_INPUT_QUERY):
         max_results=10,
         topic="general",
         include_raw_content=False,
-        include_answer=False
+        include_answer=False,
     )
 
     # Generate response using a LLM (OpenAI)
-    context_preprocessed = [
-        {"context": doc['content'], "score": doc['score']} for doc in docs['results']
-    ]
+    context_preprocessed = [{"context": doc["content"], "score": doc["score"]} for doc in docs["results"]]
 
     response = await INIT_OBJECTS.openai_client.chat.completions.create(
         model=INIT_OBJECTS.config_loader["llm_model_name"],

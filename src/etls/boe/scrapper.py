@@ -48,17 +48,11 @@ def _extract_metadata(soup) -> tp.Dict:
     if fecha_disposicion := soup.documento.metadatos.fecha_disposicion:
         metadata_dict["fecha_disposicion"] = fecha_disposicion.get_text()
 
-    metadata_dict["anio"] = datetime.strptime(
-        fecha_publicacion.get_text(), "%Y%m%d"
-    ).strftime("%Y")
+    metadata_dict["anio"] = datetime.strptime(fecha_publicacion.get_text(), "%Y%m%d").strftime("%Y")
 
-    metadata_dict["mes"] = datetime.strptime(
-        fecha_publicacion.get_text(), "%Y%m%d"
-    ).strftime("%m")
+    metadata_dict["mes"] = datetime.strptime(fecha_publicacion.get_text(), "%Y%m%d").strftime("%m")
 
-    metadata_dict["dia"] = datetime.strptime(
-        fecha_publicacion.get_text(), "%Y%m%d"
-    ).strftime("%d")
+    metadata_dict["dia"] = datetime.strptime(fecha_publicacion.get_text(), "%Y%m%d").strftime("%d")
 
     # Analisis
     if observaciones := soup.documento.analisis.observaciones:
@@ -74,25 +68,17 @@ def _extract_metadata(soup) -> tp.Dict:
         metadata_dict["tipo"] = tipo.get_text()
 
     metadata_dict["materias"] = [
-        materia.get_text()
-        for materia in soup.select("documento > analisis > materias > materia")
+        materia.get_text() for materia in soup.select("documento > analisis > materias > materia")
     ]
-    metadata_dict["alertas"] = [
-        alerta.get_text()
-        for alerta in soup.select("documento > analisis > alertas > alerta")
-    ]
-    metadata_dict["notas"] = [
-        nota.get_text() for nota in soup.select("documento > analisis > notas > nota")
-    ]
+    metadata_dict["alertas"] = [alerta.get_text() for alerta in soup.select("documento > analisis > alertas > alerta")]
+    metadata_dict["notas"] = [nota.get_text() for nota in soup.select("documento > analisis > notas > nota")]
     metadata_dict["ref_posteriores"] = [
         BOEMetadataReferencia(
             id=ref["referencia"],
             palabra=ref.palabra.get_text(),
             texto=ref.texto.get_text(),
         )
-        for ref in soup.select(
-            "documento > analisis > referencias > posteriores > posterior"
-        )
+        for ref in soup.select("documento > analisis > referencias > posteriores > posterior")
     ]
     metadata_dict["ref_anteriores"] = [
         BOEMetadataReferencia(
@@ -100,9 +86,7 @@ def _extract_metadata(soup) -> tp.Dict:
             palabra=ref.palabra.get_text(),
             texto=ref.texto.get_text(),
         )
-        for ref in soup.select(
-            "documento > analisis > referencias > anteriores > anterior"
-        )
+        for ref in soup.select("documento > analisis > referencias > anteriores > anterior")
     ]
     return metadata_dict
 
@@ -147,13 +131,9 @@ class BOEScrapper(BaseScrapper):
                     metadata_doc = self.download_document(url_document)
                     metadata_documents.append(metadata_doc)
                 except HTTPError:
-                    logger.error(
-                        "Not scrapped document %s on day %s", url_document, day_url
-                    )
+                    logger.error("Not scrapped document %s on day %s", url_document, day_url)
                 except AttributeError:
-                    logger.error(
-                        "Not scrapped document %s on day %s", url_document, day_url
-                    )
+                    logger.error("Not scrapped document %s on day %s", url_document, day_url)
         except HTTPError:
             logger.error("Not scrapped document on day %s", day_url)
         logger.info("Downloaded BOE content for day %s", day)

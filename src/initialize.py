@@ -28,9 +28,7 @@ def initialize_logging():
     logger.info("Initializing logging")
     logger.handlers = []
     handler = lg.StreamHandler()
-    formatter = lg.Formatter(
-        "[%(asctime)s] [%(process)d] [%(levelname)s] [%(name)s] %(message)s"
-    )
+    formatter = lg.Formatter("[%(asctime)s] [%(process)d] [%(levelname)s] [%(name)s] %(message)s")
     handler.setFormatter(formatter)
     logger.addHandler(handler)
     logger.setLevel(lg.INFO)
@@ -45,7 +43,7 @@ def initialize_app():
     config_loader = _init_config()
     vector_store = _init_vector_store(config_loader)
     openai_client = _init_openai_client()
-    tavily_client = TavilyClient(api_key=os.environ['TAVILY_API_KEY'])
+    tavily_client = TavilyClient(api_key=os.environ["TAVILY_API_KEY"])
     # retrieval_qa = _init_retrieval_qa_llm(vector_store, config_loader)
     logger.info("Initialized application")
     init_objects = collections.namedtuple(
@@ -138,7 +136,7 @@ def _init_vector_stores_qdrant(config_loader):
             qdrant_client.recreate_collection(
                 collection_name=collection_name,
                 vectors_config=VectorParams(
-                    size=config_loader['embeddings_model_size'], distance=config_loader['distance_type']
+                    size=config_loader["embeddings_model_size"], distance=config_loader["distance_type"]
                 ),
                 on_disk_payload=True,
             )
@@ -172,9 +170,7 @@ def _init_retrieval_qa_llm(vector_store, config_loader):
     # DEPRECATED
     logger = lg.getLogger(_init_retrieval_qa_llm.__name__)
     logger.info("Initializing RetrievalQA LLM")
-    retriever = vector_store.as_retriever(
-        search_type="similarity", search_kwargs={"k": config_loader["top_k_results"]}
-    )
+    retriever = vector_store.as_retriever(search_type="similarity", search_kwargs={"k": config_loader["top_k_results"]})
     system_template = f"{config_loader['prompt_system']}----------------\n{{context}}"
     messages = [
         SystemMessagePromptTemplate.from_template(system_template),

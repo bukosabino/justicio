@@ -14,9 +14,7 @@ app = typer.Typer()
 
 @app.command()
 def today(collection_name: str):
-    etl_job = ETL(
-        config_loader=INIT_OBJECTS.config_loader, vector_store=INIT_OBJECTS.vector_store[collection_name]
-    )
+    etl_job = ETL(config_loader=INIT_OBJECTS.config_loader, vector_store=INIT_OBJECTS.vector_store[collection_name])
     boe_scrapper = TemplateScrapper()
     day = date.today()
     docs = boe_scrapper.download_day(day)
@@ -35,9 +33,7 @@ def today(collection_name: str):
 
 @app.command()
 def dates(collection_name: str, date_start: str, date_end: str):
-    etl_job = ETL(
-        config_loader=INIT_OBJECTS.config_loader, vector_store=INIT_OBJECTS.vector_store[collection_name]
-    )
+    etl_job = ETL(config_loader=INIT_OBJECTS.config_loader, vector_store=INIT_OBJECTS.vector_store[collection_name])
     scrapper = TemplateScrapper()
     docs = scrapper.download_days(
         date_start=datetime.strptime(date_start, "%Y/%m/%d").date(),

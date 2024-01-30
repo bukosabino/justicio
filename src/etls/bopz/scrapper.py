@@ -110,7 +110,7 @@ class BOPZScrapper(BaseScrapper):
         return metadata_documents
 
     def download_document(self, url:str, metadata: BeautifulSoup) -> BOPZMetadataDocument:
-        """Get text and metadata from a BOPZ pdf document.
+        """Get text and metadata from a BOPZ document.
 
         :param url: document url link. Examples:
             * http://bop.dpz.es/BOPZ/obtenerContenidoEdicto.do?idEdicto=729066

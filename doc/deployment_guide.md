@@ -6,30 +6,36 @@ At this moment we are working with pinecone as vector database, so, please creat
 
 Once you have your pinecone index, please update the `config/config.yaml` :
 
-* vector_store_index_name: use the name of the pinecone index that you choose.
-* date_start: Choose a start date for your system. You will load BOE document from this date.
-* date_end: Choose an end date for your system. You will load BOE document to this date.
+* vector_store: use the name of the pinecone index that you choose.
 
 Export environment variables:
 
 ```
-export PINECONE_API_KEY=<your_pinecone_api_key>
-export PINECONE_ENV=<your_pinecone_env>
-export OPENAI_API_KEY=<your_open_api_key>
-export SENDGRID_API_KEY=<your_sendgrid_api_key>
 export APP_PATH="."
+export SENDGRID_API_KEY=<your_sendgrid_api_key>
+export OPENAI_API_KEY=<your_open_api_key>
+export TOKENIZERS_PARALLELISM=false
+export TAVILY_API_KEY=<your_tavily_api_key>
+export QDRANT_API_KEY="<your_qdrant_api_key>"
+export QDRANT_API_URL="<your_qdrant_api_url>"
 ```
 
 Load BOE documents into your vector database (depending on the selected data, may take a few minutes)
 
 ```
-python -m src.etls.boe.load.run
+python -m src.etls.boe.load dates collection_name 2024/01/01 2024/01/31
 ```
 
 If you want to update the vector database on a daily basis (BOE publishes new documents every day), run this file as a scheduled job (e.g. with CRON).
 
 ```
-python -m src.etls.boe.load.daily
+python -m src.etls.boe.load today collection_name
+```
+
+If you want to update the vector database on a daily basis (BOE publishes new documents every day), run this file with schedule:
+
+```
+python -m src.etls.boe.schedule
 ```
 
 ## 2. Deploy the service
@@ -52,11 +58,13 @@ pip install -r requirements.txt
 Export environment variables:
 
 ```
-export PINECONE_API_KEY="<your_pinecone_api_key>"
-export PINECONE_ENV="<your_pinecone_env>"
-export OPENAI_API_KEY="<your_open_api_key>"
-export SENDGRID_API_KEY="<your_sendgrid_api_key>"
 export APP_PATH="."
+export SENDGRID_API_KEY=<your_sendgrid_api_key>
+export OPENAI_API_KEY=<your_open_api_key>
+export TOKENIZERS_PARALLELISM=false
+export TAVILY_API_KEY=<your_tavily_api_key>
+export QDRANT_API_KEY="<your_qdrant_api_key>"
+export QDRANT_API_URL="<your_qdrant_api_url>"
 ```
 
 Run the service

@@ -125,7 +125,6 @@ def _init_vector_stores_qdrant(config_loader):
         api_key=os.environ["QDRANT_API_KEY"],
         prefer_grpc=True,
     )
-
     embeddings = HuggingFaceEmbeddings(
         model_name=config_loader["embeddings_model_name"],
         model_kwargs={"device": "cpu"},

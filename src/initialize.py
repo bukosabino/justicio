@@ -16,7 +16,7 @@ from langchain.vectorstores.pinecone import Pinecone
 from langchain.vectorstores.qdrant import Qdrant
 from openai import AsyncOpenAI
 from qdrant_client import QdrantClient
-from qdrant_client.models import Distance, VectorParams
+from qdrant_client.models import VectorParams
 from supabase.client import Client, create_client
 from tavily import TavilyClient
 
@@ -28,9 +28,7 @@ def initialize_logging():
     logger.info("Initializing logging")
     logger.handlers = []
     handler = lg.StreamHandler()
-    formatter = lg.Formatter(
-        "[%(asctime)s] [%(process)d] [%(levelname)s] [%(name)s] %(message)s"
-    )
+    formatter = lg.Formatter("[%(asctime)s] [%(process)d] [%(levelname)s] [%(name)s] %(message)s")
     handler.setFormatter(formatter)
     logger.addHandler(handler)
     logger.setLevel(lg.INFO)
@@ -45,7 +43,7 @@ def initialize_app():
     config_loader = _init_config()
     vector_store = _init_vector_store(config_loader)
     openai_client = _init_openai_client()
-    tavily_client = TavilyClient(api_key=os.environ['TAVILY_API_KEY'])
+    tavily_client = TavilyClient(api_key=os.environ["TAVILY_API_KEY"])
     # retrieval_qa = _init_retrieval_qa_llm(vector_store, config_loader)
     logger.info("Initialized application")
     init_objects = collections.namedtuple(
@@ -69,7 +67,7 @@ def _init_vector_store(config_loader):
     elif config_loader["vector_store"] == "supabase":
         vector_store = _init_vector_store_supabase(config_loader)
     elif config_loader["vector_store"] == "qdrant":
-        vector_store = _init_vector_store_qdrant(config_loader)
+        vector_store = _init_vector_stores_qdrant(config_loader)
     else:
         raise ValueError("Vector Database not configured")
     return vector_store
@@ -119,9 +117,9 @@ def _init_vector_store_supabase(config_loader):
     return vector_store
 
 
-def _init_vector_store_qdrant(config_loader):
-    logger = lg.getLogger(_init_vector_store_qdrant.__name__)
-    logger.info("Initializing vector store")
+def _init_vector_stores_qdrant(config_loader):
+    logger = lg.getLogger(_init_vector_stores_qdrant.__name__)
+    logger.info("Initializing vector stores")
     qdrant_client = QdrantClient(
         url=os.environ["QDRANT_API_URL"],
         api_key=os.environ["QDRANT_API_KEY"],
@@ -132,20 +130,21 @@ def _init_vector_store_qdrant(config_loader):
         model_name=config_loader["embeddings_model_name"],
         model_kwargs={"device": "cpu"},
     )
-
-    # Check if collection exists
-
-    if not _collection_exists(qdrant_client, config_loader):
-        logger.info("Creating collection for vector store")
-        qdrant_client.recreate_collection(
-            collection_name=config_loader["collection_name"],
-            vectors_config=VectorParams(size=768, distance=Distance.COSINE),
-            on_disk_payload=True,
-        )
-        logger.info("Created collection [%s] for vector store", config_loader["collection_name"] )
-    vector_store = Qdrant(qdrant_client, config_loader["collection_name"], embeddings)
-    logger.info("Initialized vector store")
-    return vector_store
+    vector_stores = {}
+    for collection_name in config_loader["collections"]:
+        if not _exists_collection(qdrant_client, collection_name):
+            logger.info("Creating collection for vector store")
+            qdrant_client.recreate_collection(
+                collection_name=collection_name,
+                vectors_config=VectorParams(
+                    size=config_loader["embeddings_model_size"], distance=config_loader["distance_type"]
+                ),
+                on_disk_payload=True,
+            )
+            logger.info("Created collection [%s] for vector store", collection_name)
+        vector_stores[collection_name] = Qdrant(qdrant_client, collection_name, embeddings)
+        logger.info("Initialized vector store for collection [%s]", collection_name)
+    return vector_stores
 
 def _collection_exists(client, config_loader):
     logger = lg.getLogger(_collection_exists.__name__)
@@ -159,7 +158,7 @@ def _collection_exists(client, config_loader):
 
 
 def _init_openai_client():
-    logger = lg.getLogger(_init_retrieval_qa_llm.__name__)
+    logger = lg.getLogger(_init_openai_client.__name__)
     logger.info("Initializing OpenAI client")
     client = AsyncOpenAI(
         api_key=os.environ.get("OPENAI_API_KEY"),
@@ -168,13 +167,21 @@ def _init_openai_client():
     return client
 
 
+def _exists_collection(client, collection_name):
+    logger = lg.getLogger(_exists_collection.__name__)
+    try:
+        client.get_collection(collection_name=collection_name)
+        return True
+    except:
+        logger.warn("Collection [%s] doesn't exist", collection_name)
+        return False
+
+
 def _init_retrieval_qa_llm(vector_store, config_loader):
     # DEPRECATED
     logger = lg.getLogger(_init_retrieval_qa_llm.__name__)
     logger.info("Initializing RetrievalQA LLM")
-    retriever = vector_store.as_retriever(
-        search_type="similarity", search_kwargs={"k": config_loader["top_k_results"]}
-    )
+    retriever = vector_store.as_retriever(search_type="similarity", search_kwargs={"k": config_loader["top_k_results"]})
     system_template = f"{config_loader['prompt_system']}----------------\n{{context}}"
     messages = [
         SystemMessagePromptTemplate.from_template(system_template),

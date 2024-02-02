@@ -48,9 +48,9 @@ It is the web service, and it is a central component for the whole system, doing
 
 #### Loading data
 
-We download the BOE documents and break them into small chunks of text (e.g. 1200 characters). Each text chunk is transformed into an embedding (e.g. a numerically dense vector of 768 sizes). Some additional metadata is also stored with the vectors so that we can pre- or post-filter the search results. [Check the code](https://github.com/bukosabino/ia-boe/blob/main/src/etls/boe/load/run.py)
+We download the BOE documents and break them into small chunks of text (e.g. 1200 characters). Each text chunk is transformed into an embedding (e.g. a numerically dense vector of 768 sizes). Some additional metadata is also stored with the vectors so that we can pre- or post-filter the search results. [Check the code](https://github.com/bukosabino/ia-boe/blob/main/src/etls/boe/load.py)
 
-The BOE is updated every day, so we need to run an ETL job every day to retrieve the new documents, transform them into embeddings, link the metadata, and store them in the embedding database. [Check the code](https://github.com/bukosabino/ia-boe/blob/main/src/etls/boe/load/daily.py)
+The BOE is updated every day, so we need to run an ETL job every day to retrieve the new documents, transform them into embeddings, link the metadata, and store them in the embedding database. [Check the code](https://github.com/bukosabino/ia-boe/blob/main/src/etls/boe/load.py)
 
 #### Reading data
 
@@ -102,3 +102,4 @@ You are welcome! Please, contact us to see how you can help.
 * [Darío López](https://www.linkedin.com/in/dar%C3%ADo-l%C3%B3pez-padial-45269150/) 
 * [Alex Dantart](https://www.linkedin.com/in/dantart/)
 * [Jorge Iliarte](https://www.linkedin.com/in/jorge-iliarte-llop/)
+* [Jorge Barrachina](https://www.linkedin.com/in/jorgebarrachina/)

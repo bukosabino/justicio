@@ -11,9 +11,7 @@ initialize_logging()
 
 
 class BaseScrapper(ABC):
-    def download_days(
-        self, date_start: date, date_end: date
-    ) -> tp.List[MetadataDocument]:
+    def download_days(self, date_start: date, date_end: date) -> tp.List[MetadataDocument]:
         """Download all the documents between two dates (from date_start to date_end)"""
         logger = lg.getLogger(self.download_days.__name__)
         logger.info("Downloading content from day %s to %s", date_start, date_end)

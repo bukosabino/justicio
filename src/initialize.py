@@ -146,16 +146,6 @@ def _init_vector_stores_qdrant(config_loader):
         logger.info("Initialized vector store for collection [%s]", collection_name)
     return vector_stores
 
-def _collection_exists(client, config_loader):
-    logger = lg.getLogger(_collection_exists.__name__)
-    try:
-        client.get_collection(collection_name=config_loader["collection_name"])
-        result = True
-    except:
-        logger.warn("Collection [%s] doesn't exist", config_loader["collection_name"])
-        result = False    
-    return result
-
 
 def _init_openai_client():
     logger = lg.getLogger(_init_openai_client.__name__)

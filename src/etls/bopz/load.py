@@ -3,7 +3,7 @@ from datetime import date, datetime
 import typer
 
 from src.email.send_email import send_email
-from src.etls.bopz.scrapper import BOPZScrapperclea
+from src.etls.bopz.scrapper import BOPZScrapper
 from src.etls.common.etl import ETL
 from src.initialize import initialize_app
 

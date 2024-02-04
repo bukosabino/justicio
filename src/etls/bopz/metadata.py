@@ -4,17 +4,18 @@ from datetime import datetime
 from pydantic import field_validator
 
 from src.etls.common.metadata import MetadataDocument
-    
+
+
 class BOPZMetadataDocument(MetadataDocument):
     """Class for keeping metadata of a BOPZ Document scrapped."""
-    
+
     # Text
     filepath: str
 
     # Source
     source_name: str = "BOPZ"
     source_type: str = "Boletin"
-        
+
     # Metadatos
     identificador: str
     numero_oficial: str = ""
@@ -30,7 +31,7 @@ class BOPZMetadataDocument(MetadataDocument):
 
     # Analisis
     materia: tp.List[str]
-    
+
     datetime_insert: str = datetime.utcnow().isoformat()
 
     @field_validator("fecha_publicacion", "fecha_disposicion")

@@ -32,3 +32,10 @@ class BOPZMetadataDocument(MetadataDocument):
     materia: tp.List[str]
     
     datetime_insert: str = datetime.utcnow().isoformat()
+
+    @field_validator("fecha_publicacion", "fecha_disposicion")
+    @classmethod
+    def isoformat(cls, v):
+        if v:
+            return datetime.strptime(v, "%Y%m%d").strftime("%Y-%m-%d")
+        return v

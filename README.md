@@ -1,6 +1,6 @@
-# IA BOE
+# Justicio
 
-Question/Answering Assistant that generates answers from user questions about the official state gazette of Spain: 
+Justicio is a Question/Answering Assistant that generates answers from user questions about the official state gazette of Spain: 
 Boletín Oficial del Estado (BOE).
 
 [Spanish link](https://www.boe.es)

@@ -6,6 +6,7 @@ from src.email.send_email import send_email
 from src.etls.bocm.scrapper import BOCMScrapper
 from src.etls.common.etl import ETL
 from src.initialize import initialize_app
+from src.etls.bocm.defs import COLLECTION_NAME
 
 
 app = typer.Typer()
@@ -13,8 +14,8 @@ INIT_OBJECTS = initialize_app()
 
 
 @app.command()
-def today(collection_name: str):
-    etl_job = ETL(config_loader=INIT_OBJECTS.config_loader, vector_store=INIT_OBJECTS.vector_store[collection_name])
+def today():
+    etl_job = ETL(config_loader=INIT_OBJECTS.config_loader, vector_store=INIT_OBJECTS.vector_store[COLLECTION_NAME])
     bocm_scrapper = BOCMScrapper()
     day = date.today()
     docs = bocm_scrapper.download_day(day)
@@ -32,8 +33,8 @@ def today(collection_name: str):
 
 
 @app.command()
-def dates(collection_name: str, date_start: str, date_end: str):
-    etl_job = ETL(config_loader=INIT_OBJECTS.config_loader, vector_store=INIT_OBJECTS.vector_store[collection_name])
+def dates(date_start: str, date_end: str):
+    etl_job = ETL(config_loader=INIT_OBJECTS.config_loader, vector_store=INIT_OBJECTS.vector_store[COLLECTION_NAME])
     bocm_scrapper = BOCMScrapper()
     docs = bocm_scrapper.download_days(
         date_start=datetime.strptime(date_start, "%Y/%m/%d").date(),

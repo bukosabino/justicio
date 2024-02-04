@@ -1,7 +1,7 @@
 import typing as tp
 from datetime import datetime
 
-from pydantic import BaseModel, field_validator
+from pydantic import field_validator
 
 from src.etls.common.metadata import MetadataDocument
     
@@ -19,7 +19,7 @@ class BOPZMetadataDocument(MetadataDocument):
     identificador: str
     numero_oficial: str = ""
     departamento: str
-    titulo: str
+    titulo: str = ""
     url_pdf: str
     url_html: str
     fecha_publicacion: str
@@ -37,5 +37,5 @@ class BOPZMetadataDocument(MetadataDocument):
     @classmethod
     def isoformat(cls, v):
         if v:
-            return datetime.strptime(v, "%Y%m%d").strftime("%Y-%m-%d")
+            datetime.strptime(v, "%Y-%m-%d")
         return v

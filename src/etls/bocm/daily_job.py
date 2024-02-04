@@ -2,7 +2,7 @@ import time
 
 import schedule
 
-from src.etls.boe.load import today
+from src.etls.bocm.load import today
 
 
 schedule.every().day.at("11:00").do(today, collection_name="bocm")

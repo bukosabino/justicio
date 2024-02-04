@@ -1,3 +1,4 @@
+import re
 import logging as lg
 import tempfile
 import typing as tp
@@ -14,32 +15,33 @@ from src.initialize import initialize_logging
 
 initialize_logging()
 
-def _extract_span_text(row: BeautifulSoup, text_label: str) -> str:
+
+def _extract_span_text(row: BeautifulSoup, regex: str) -> str:
     """
     Extracts the text of the next sibling for a span element that contains the specified text_label.
     
     :param row: The BeautifulSoup row element to search within.
-    :param text_label: The text to search for within the span element.
+    :param regex: The regular expresion to search for within the span element.
     :return: The stripped text of the next sibling if found, otherwise an empty string.
     """
-    span_element = row.find('span', string=lambda t: text_label in t)
+    span_element = row.find('span', string=lambda t: re.search(regex, t))
     return span_element.next_sibling.strip() if span_element and span_element.next_sibling else None
 
 def _extract_metadata(soup) -> tp.Dict:
     metadata_dict = {}
-    
+
     # Metadatos
-    if numero_registro := _extract_span_text(soup, 'Nº. Reg:'):
+    if numero_registro := _extract_span_text(soup, r'N.\. Reg:'):
         metadata_dict["numero_oficial"] = numero_registro.split('/')[0]
         metadata_dict["titulo"] = f"BOPZ-{numero_registro.replace('/', '-')}"
-    
-    if departamento := _extract_span_text(soup, 'Publicador:'):
+
+    if departamento := _extract_span_text(soup, r'Publicador:'):
         metadata_dict["departamento"] = departamento
     
-    if materia := _extract_span_text(soup, 'Materia'):
+    if materia := _extract_span_text(soup, r'Materia'):
         metadata_dict["materia"] = [materia]
         
-    if fecha_publicacion := _extract_span_text(soup, 'Fecha Pub:'):
+    if fecha_publicacion := _extract_span_text(soup, r'Fecha Pub:'):
         fecha_publicacion = datetime.strptime(fecha_publicacion, "%d/%m/%Y").strftime("%Y-%m-%d")
         metadata_dict["fecha_publicacion"] = fecha_publicacion
         metadata_dict["fecha_disposicion"] = fecha_publicacion

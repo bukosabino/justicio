@@ -77,23 +77,12 @@ the most similar documents returned by the embedding database.
 - Langchain
 - FastAPI
 - Qdrant
-- OpenAI API (gpt-3.5-turbo)
 - [Fine tuned Spanish SBert model](https://github.com/bukosabino/sbert-spanish)
 - BeautifulSoup
 
 # Deploy your own service
 
 Check `deployment_guide.md` file
-
-# Future features
-
-* Summarize ELI5
-* From QA to chat conversation (using memory)
-* Add other regional and/or provincial gazettes https://www.boe.es/legislacion/otros_diarios_oficiales.php
-* Generate smart questions from an article
-* Use OpenAI Moderation API to filter wrong behaviours from users: https://platform.openai.com/docs/guides/moderation
-* Create an OpenAI plugin
-* Create a Justicio GPT on OpenAI
 
 # Want to help develop the project?
 

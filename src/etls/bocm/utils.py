@@ -15,8 +15,11 @@ def _get_url_from_cve(cve: str) -> str:
 
 # Metadata from head tags
 def metadata_from_head_tags(soup) -> tp.List[str]:
-    fecha_publicacion = soup.select_one('meta[property="article:published_time"]')["content"].split("T")[0]
-    cve = soup.select_one('meta[property="og:title"]')["content"]
+    # extract cve from meta[name="TituloGSA"]
+    cve = soup.select_one('meta[name="TituloGSA"]')["content"]
+    fecha = cve.split("-")[1:2][0]
+    fecha_publicacion = f'{fecha[:4]}-{fecha[4:6]}-{fecha[6:8]}'
+
     html_link = soup.select_one('meta[property="og:url"]')["content"]
 
     return [fecha_publicacion, cve, html_link]
@@ -30,16 +33,21 @@ def metadata_from_doc(soup, seccion: str, cve: str) -> tp.List[str]:
     apartado, tipo, anunciante, organo, rango = ["", "", "", "", ""]
 
     # get headers
-    seccion_name, *paras = [f.get_text().strip().upper() for f in soup.select("#cabeceras #cabeceras p")]
+    paras = [f.get_text().strip().upper() for f in soup.select("#cabeceras p")][:3]
 
     # Metadata from article description
-    desc = soup.select_one('meta[name="description"]')["content"]
+    desc_attempt = soup.select_one('meta[name="description"]')
+    if (desc_attempt is not None):
+        desc = desc_attempt["content"]
+    else:
+        desc = ''
     num_art = re.sub(r"BOCM-\d{8}-(\d{1,3})", r"\1", cve)
 
     try:
         if seccion == "1":
             subseccion_letter = ["A", "B", "C", "D"][int(seccion) - 1]
-            subseccion_name, organo = paras
+            subseccion_name = paras[0]
+            organo = paras[2]
             # Some articles don't have filled description needed for rango field extraction
             if len(desc) > 10:
                 rango = re.sub(r"^(\b[^\s]+\b)(.*)", r"\1", desc.split(num_art)[1], flags=re.ASCII).upper()

@@ -18,7 +18,7 @@ To define an ETL for your gazette, you need to fill some files:
 If you want to do a batch/historical load:
 
 ```sh
-python -m src.etls.template.load dates <collection_name> <date_start_%Y/%m/%d> <date_end_%Y/%m/%d>
+python -m src.etls.template.load dates <date_start_%Y/%m/%d> <date_end_%Y/%m/%d>
 ```
 
 Note: You should update the end/start dates in the `config/config.py' file.
@@ -28,7 +28,7 @@ Note: You should update the end/start dates in the `config/config.py' file.
 Most likely, your Gazette will be updated every day, so you will need to run a daily ETL script. Take a look at src.etls.template.load.py for inspiration.
 
 ```sh
-python -m src.etls.template.load today <collection_name>
+python -m src.etls.template.load today
 ```
 
 You will probably also want to schedule a daily job to update your embedding database. Then take a look at `src/etls/template/schedule.py`.

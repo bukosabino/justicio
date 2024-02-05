@@ -5,7 +5,7 @@ isort:
 	isort --check-only src evaluation
 
 format: isort
-	black src evaluation
+	black --line-length=120 src evaluation
 
 isort-fix:
 	isort src evaluation

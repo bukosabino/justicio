@@ -2,11 +2,7 @@
 
 ## 1. Prepare your vector database
 
-At this moment we are working with pinecone as vector database, so, please create an account and an index. Check [the pinecone documentation](https://docs.pinecone.io/docs/overview)
-
-Once you have your pinecone index, please update the `config/config.yaml` :
-
-* vector_store: use the name of the pinecone index that you choose.
+At this moment we are working with qdrant as vector database, so, please create an account and a cluster. Check [the qdrant documentation](https://qdrant.tech/documentation/)
 
 Export environment variables:
 
@@ -20,22 +16,22 @@ export QDRANT_API_KEY="<your_qdrant_api_key>"
 export QDRANT_API_URL="<your_qdrant_api_url>"
 ```
 
-Load BOE documents into your vector database (depending on the selected data, may take a few minutes)
+Load documents into your vector database (depending on the selected data, may take a few minutes)
 
 ```
-python -m src.etls.boe.load dates collection_name 2024/01/01 2024/01/31
+python -m src.etls.collection_name.load dates 2024/01/01 2024/01/31
 ```
 
 If you want to update the vector database on a daily basis (BOE publishes new documents every day), run this file as a scheduled job (e.g. with CRON).
 
 ```
-python -m src.etls.boe.load today collection_name
+python -m src.etls.collection_name.load today
 ```
 
 If you want to update the vector database on a daily basis (BOE publishes new documents every day), run this file with schedule:
 
 ```
-python -m src.etls.boe.schedule
+nohup python -m src.etls.jobs &
 ```
 
 ## 2. Deploy the service
@@ -43,7 +39,7 @@ python -m src.etls.boe.schedule
 Clone the code:
 
 ```
-git clone git@github.com:bukosabino/ia-boe.git
+git clone git@github.com:bukosabino/justicio.git
 ```
 
 Install the requirements:

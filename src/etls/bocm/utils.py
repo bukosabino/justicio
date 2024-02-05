@@ -66,7 +66,7 @@ def metadata_from_doc(soup, seccion: str, cve: str) -> tp.List[str]:
                 organo = paras[0]
 
         if seccion == "4":
-            subseccion_name = paras[0]
+            subseccion_name = "ADMINISTRACIÓN DE JUSTICIA"
         if seccion == "5":
             subseccion_name = "OTROS ANUNCIOS"
             anunciante = paras[0]

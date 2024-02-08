@@ -10,10 +10,14 @@ from sentence_transformers import SentenceTransformer
 # model_name = "dariolopez/roberta-base-bne-finetuned-msmarco-qa-es-mnrl-mn"
 # model_name = "dariolopez/roberta-base-bne-finetuned-msmarco-qa-es"
 # model_name = "PlanTL-GOB-ES/roberta-base-bne"
+# model_name = "PlanTL-GOB-ES/RoBERTalex"
 
 # model_name = "hiiamsid/sentence_similarity_spanish_es"
-model_name = "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"
+# model_name = "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"
+# model_name = "intfloat/multilingual-e5-small"
+# model_name = "intfloat/multilingual-e5-base"
 # model_name = "intfloat/multilingual-e5-large"
+model_name = "intfloat/multilingual-e5-large-instruct"
 
 
 model = SentenceTransformer(model_name)

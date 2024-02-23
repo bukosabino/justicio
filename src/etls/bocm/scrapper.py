@@ -151,7 +151,7 @@ class BOCMScrapper(BaseScrapper):
                     except AttributeError:
                         logger.error("Not scrapped document %s on day %s", url, day)
             except HTTPError:
-                logger.error("Not scrapped document on day %s", day_url)
+                logger.error("Not scrapped document %s on day %s", url, day)
             logger.info("Downloaded all BOCM docs for day %s", day)
         return metadata_documents
 

@@ -4,17 +4,17 @@ import tempfile
 import typing as tp
 from datetime import date
 
-from pdfminer.layout import LAParams
-
 from src.etls.bopgr.metadata import BOPGRMetadataDocument
 from src.etls.bopgr.pdf_processor import pdf_download, text_extract, process_bulletin
 from src.etls.bopgr.processor.cleanup.hyphens_line_cleanup import HyphensLineCleanUp
 from src.etls.bopgr.processor.cleanup.new_line_cleanup import NewLineCleanUp
+from src.etls.bopgr.processor.debug_line_processor import DebugLineProcessor
+from src.etls.bopgr.processor.line_processor import RegexLineProcessor
 from src.etls.bopgr.processor.metadata.author_metadata import AuthorMetadata
 from src.etls.bopgr.processor.metadata.bulletin_number_metadata import BulletinNumberMetadata
 from src.etls.bopgr.processor.metadata.issn_metadata import ISSNMetadata
 from src.etls.bopgr.processor.metadata.year_metadata import YearMetadata
-from src.etls.bopgr.processor.line_processor import RegexLineProcessor
+from src.etls.bopgr.processor.metadata.subject_metadata import SubjectMetadata
 from src.etls.common.scrapper import BaseScrapper
 from src.initialize import initialize_logging
 
@@ -23,11 +23,15 @@ initialize_logging()
 
 class BOPGRScrapper(BaseScrapper):
     metadata_processors = [
+        #DebugLineProcessor(),
         YearMetadata(),
         ISSNMetadata(),
         AuthorMetadata(),
         BulletinNumberMetadata(),
-        #DebugLineProcessor()
+    ]
+
+    content_metadata_processors = [
+        SubjectMetadata()
     ]
 
     clean_up_processors = [
@@ -39,6 +43,7 @@ class BOPGRScrapper(BaseScrapper):
         RegexLineProcessor(re.compile(r' *Página +\d+ *')),
         RegexLineProcessor(re.compile(r' *n\n')),
         RegexLineProcessor(re.compile(r' *Granada,.* \d{4}\n')),
+        RegexLineProcessor(re.compile(r'B\.O\.P\..*número *\d+')),
     ]
 
     def download_day(self, day: date) -> tp.List[BOPGRMetadataDocument]:
@@ -71,7 +76,7 @@ class BOPGRScrapper(BaseScrapper):
 
             if pdf_path:
 
-                text_path = text_extract(pdf_path, temp_dir, laparams=LAParams(char_margin=4.0, line_margin=2.0))
+                text_path = text_extract(pdf_path, temp_dir)
                 logger.debug(f"Bulletin downloaded and the text has been extracted in {text_path}.\n")
 
                 metadata = {
@@ -82,9 +87,10 @@ class BOPGRScrapper(BaseScrapper):
 
                 return process_bulletin(text_path=text_path,
                                         metadata=metadata,
-                                        metadata_processors=self.metadata_processors,
+                                        general_metadata_processors=self.metadata_processors,
+                                        content_metadata_processors=self.content_metadata_processors,
                                         clean_up_processors=self.clean_up_processors,
-                                        new_content_detector=RegexLineProcessor(re.compile(r'^NÚMERO (\d+) $')),
+                                        new_content_detector=RegexLineProcessor(re.compile(r'^.{0,2}NÚMERO ([\d./]+) ?$')),
                                         skip_processors=self.skip_line_processors)
             else:
                 return []

@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 
 from pydantic import field_validator
 
@@ -27,16 +28,20 @@ class BOPGRMetadataDocument(MetadataDocument):
     anio: str = ""
     mes: str = ""
     dia: str = ""
+    entidad: Optional[str]
+    provincia: Optional[str]
+    asunto: Optional[str]
+    edicto: Optional[str]
 
-    legal_deposit: str
-    issn: str
-    administracion: str
-    direccion: str
-    telefono: str
-    fax: str
+    legal_deposit: Optional[str]
+    issn: Optional[str]
+    administracion: Optional[str]
+    direccion: Optional[str]
+    telefono: Optional[str]
+    fax: Optional[str]
 
     # Analisis
-    materia: str
+    materia: Optional[str]
 
     datetime_insert: str = datetime.utcnow().isoformat()
 

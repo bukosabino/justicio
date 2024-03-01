@@ -5,7 +5,7 @@ from src.etls.bopgr.processor.line_processor import RegexLineProcessor, Metadata
 
 class BulletinNumberMetadata(RegexLineProcessor, MetadataProcessor):
     def __init__(self):
-        p = re.compile(r'B\.O\.P\..*número *(\d+)')
+        p = re.compile(r'^(\d+)\n$')
         super().__init__(pattern=p)
 
     def get_metadata(self, line: str) -> dict:

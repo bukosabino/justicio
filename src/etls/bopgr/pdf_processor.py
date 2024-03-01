@@ -3,9 +3,9 @@ import os
 import tempfile
 import typing as tp
 
+import fitz
 import requests
-from pdfminer.high_level import extract_text
-from pdfminer.layout import LAParams
+from pydantic import ValidationError
 
 from src.etls.bopgr.metadata import BOPGRMetadataDocument
 from src.etls.bopgr.processor.line_processor import MetadataProcessor, CleanUpProcessor, LineProcessor
@@ -37,7 +37,7 @@ def pdf_download(url, temp_directory):
         return None
 
 
-def text_extract(pdf_path: str, temp_directory: str, laparams=tp.Optional[LAParams]):
+def text_extract(pdf_path: str, temp_directory: str):
     """
     Download a PDF file from a given URL.
 
@@ -48,7 +48,8 @@ def text_extract(pdf_path: str, temp_directory: str, laparams=tp.Optional[LAPara
     :rtype: str or None
     """
     logger = lg.getLogger(text_extract.__name__)
-    text = extract_text(pdf_path, laparams=laparams)
+    with fitz.open(pdf_path) as doc:
+        text = chr(12).join([page.get_text() for page in doc])
     logger.debug(f"PDF {pdf_path} has been extracted: \n{text}\n")
 
     fd, text_path = tempfile.mkstemp(dir=temp_directory, suffix=".txt")
@@ -60,46 +61,52 @@ def text_extract(pdf_path: str, temp_directory: str, laparams=tp.Optional[LAPara
 
 def process_bulletin(text_path:str,
                      metadata: dict,
-                     metadata_processors: tp.List[MetadataProcessor],
+                     general_metadata_processors: tp.List[MetadataProcessor],
+                     content_metadata_processors: tp.List[MetadataProcessor],
                      clean_up_processors: tp.List[CleanUpProcessor],
                      skip_processors: tp.List[LineProcessor],
-                     new_content_detector: LineProcessor
+                     new_content_detector: LineProcessor,
+                     general_metadata_processor_max_line: int = 15,
                      ) -> tp.List[BOPGRMetadataDocument]:
     """
     Process a bulletin, extracting metadata and relevant content.
 
     :param str text_path: The path to the text file containing the bulletin content.
     :param dict metadata: Metadata dictionary to be populated.
-    :param List[MetadataProcessor] metadata_processors: List of processors for extracting metadata.
+    :param List[MetadataProcessor] general_metadata_processors: List of processors for extracting metadata.
+    :param List[MetadataProcessor] content_metadata_processors: List of processors for extracting metadata from content.
     :param List[CleanUpProcessor] clean_up_processors: List of processors for cleaning up content.
     :param List[LineProcessor] skip_processors: List of processors for lines that should be skipped.
     :param LineProcessor new_content_detector: Processor for detecting new content.
+    :param int general_metadata_processor_max_line: Max line number to look for metadata processors.
 
     :return: List of BOPGRMetadataDocument objects representing processed bulletins.
     :rtype: List[BOPGRMetadataDocument]
     """
+    logger = lg.getLogger(process_bulletin.__name__)
     metadata_documents = []
     new_content = False
     with open(text_path, 'r', encoding='utf-8') as file:
         content = None
-        for line in file:
-            if any(skip_line.test(line) for skip_line in skip_processors):
-                continue
+        for index, line in enumerate(file):
+            if index < general_metadata_processor_max_line:
+                for processor in general_metadata_processors:
+                    if processor.test(line):
+                        metadata = metadata | processor.get_metadata(line)
+                        break
+                    continue
 
-            process_content = True
-            for processor in metadata_processors:
-                if processor.test(line):
-                    metadata = metadata | processor.get_metadata(line)
-                    process_content = processor.include_line()
-                    break
-            if not process_content:
+            if any(skip_line.test(line) for skip_line in skip_processors):
                 continue
 
             if new_content_detector.test(line):
                 new_content = True
                 if content:
-                    meta = BOPGRMetadataDocument(materia=content, **metadata)
-                    metadata_documents.append(meta)
+                    try:
+                        content_metadata = _get_content_metadata(content, content_metadata_processors,metadata.copy())
+                        metadata_documents.append(content_metadata)
+                    except ValidationError:
+                        logger.exception("Error processing content. Check edict previous to '%s'", line)
                 content = ""
 
             if new_content:
@@ -107,5 +114,18 @@ def process_bulletin(text_path:str,
                     if processor.test(line):
                         line = processor.clean(line)
                 content += line
+        if content:
+            try:
+                content_metadata = _get_content_metadata(content, content_metadata_processors,metadata.copy())
+                metadata_documents.append(content_metadata)
+            except ValidationError:
+                logger.exception("Error processing content. Check last edict.")
     return metadata_documents
+
+
+def _get_content_metadata(content, content_metadata_processors, content_metadata) -> tp.Optional[BOPGRMetadataDocument]:
+    for processor in content_metadata_processors:
+        if processor.test(content):
+            content_metadata = content_metadata | processor.get_metadata(content)
+    return BOPGRMetadataDocument(materia=content, **content_metadata)
 

@@ -35,6 +35,32 @@ POST collections/justicio/points/count
   }
 }
 
+// Count points in a collection, using filter by multiple metadata
+POST collections/justicio/points/count
+{
+  "filter": {
+    "must": [
+      {
+        "key": "metadata.anio",
+        "match": {
+          "value": "2024"
+        }
+      },
+      {
+        "key": "metadata.mes",
+        "match": {
+          "value": "02"
+        }
+      },
+      {
+        "key": "metadata.dia",
+        "match": {
+          "value": "20"
+        }
+      }
+    ]
+  }
+}
 
 // Delete points in a collection, using filter by metadata
 POST collections/justicio/points/delete

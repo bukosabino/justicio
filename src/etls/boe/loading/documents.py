@@ -9,8 +9,9 @@ import numpy as np
 
 from src.email.send_email import send_email
 from src.etls.boe.scrapper import BOEScrapper
-from src.etls.boe.load.defs_id_largos import BOE_IDS
+from src.etls.boe.loading.defs_id_largos import BOE_IDS
 from src.etls.common.etl import ETL
+from src.etls.boe.defs import COLLECTION_NAME
 from src.initialize import initialize_app, initialize_logging
 
 initialize_logging()
@@ -58,16 +59,16 @@ def filter_documents_loaded(documents: tp.List[str]) -> tp.List[str]:
 if __name__ == "__main__":
     logger = lg.getLogger("__main__")
     INIT_OBJECTS = initialize_app()
-    etl_job = ETL(config_loader=INIT_OBJECTS.config_loader, vector_store=INIT_OBJECTS.vector_store)
+    etl_job = ETL(config_loader=INIT_OBJECTS.config_loader, vector_store=INIT_OBJECTS.vector_store[COLLECTION_NAME])
     boe_scrapper = BOEScrapper()
 
-    documents = load_important_ids("src/etls/boe/load/defs_ids_importantes.txt")
+    documents = load_important_ids("src/etls/boe/loading/defs_ids_importantes.txt")
     documents += BOE_IDS
     logger.info("Documents size: %s", len(documents))
     documents_filtered = list(set(documents))
-    logger.info("Documents filtered size: %s", len(documents_filtered))
+    logger.info("Documents filtered by unique: %s", len(documents_filtered))
     documents_filtered = filter_documents_by_year(documents_filtered)
-    logger.info("Documents filtered size: %s", len(documents_filtered))
+    logger.info("Documents filtered by year: %s", len(documents_filtered))
     logger.info(documents_filtered)
     # documents_filtered = filter_documents_loaded(documents_filtered)
     # logger.info('Documents filtered size: %s', len(documents_filtered))
@@ -90,7 +91,7 @@ if __name__ == "__main__":
     content = f"""
     Documents ETL executed
     - Documents loaded (BOE ids): {len(documents_filtered)}
-    - Documents loaded: {len(docs)} 
+    - Documents loaded: {len(docs)}
     - Database used: {INIT_OBJECTS.config_loader['vector_store']}
     """
     send_email(INIT_OBJECTS.config_loader, subject, content)

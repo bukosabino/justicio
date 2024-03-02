@@ -4,8 +4,8 @@ chunk_overlap: 100
 
 admin_email: bukosabino@gmail.com
 
-embeddings_model_name: dariolopez/roberta-base-bne-finetuned-msmarco-qa-es-mnrl-mn
-embeddings_model_size: 768
+embeddings_model_name: intfloat/multilingual-e5-large
+embeddings_model_size: 1024
 
 vector_store: 'qdrant'  # {'qdrant', 'pinecone', 'supabase'}
 top_k_results: 10
@@ -26,6 +26,7 @@ prompt_system_context: |
 # Qdrant
 collections:
   - justicio
+  - boe
   - bocm
   - bopz
 

@@ -1,1 +1,1 @@
-COLLECTION_NAME = "justicio"
+COLLECTION_NAME = "boe"

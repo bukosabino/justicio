@@ -169,6 +169,7 @@ cython_debug/
 
 .secrets
 .continous_deployment.md
+.qdrant.yaml
 cron_etl_daily.sh
 cron_etl_initial.sh
 

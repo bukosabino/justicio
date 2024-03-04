@@ -26,6 +26,7 @@ prompt_system_context: |
 # Qdrant
 collections:
   - justicio
+  - boe
   - bocm
   - bopz
   - bopv

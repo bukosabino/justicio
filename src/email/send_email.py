@@ -18,4 +18,4 @@ def send_email(config_loader, subject: str, content: str) -> None:
     content = Content("text/plain", content)
     mail = Mail(from_email, to_email, subject, content)
     response = sg.client.mail.send.post(request_body=mail.get())
-    logger.info("Sent email with status %s", response)
+    logger.info("Sent email with status %s", response.status_code)

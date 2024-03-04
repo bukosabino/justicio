@@ -1,7 +1,7 @@
 
 # Web principal
 
-[Web principal del BOPZ](https://www.euskadi.eus/web01-bopv/es/bopv2/datos/Ultimo.shtml)
+[Web principal del BOJA](https://www.euskadi.eus/web01-bopv/es/bopv2/datos/Ultimo.shtml)
 
 
 # Portal de búsqueda avanzada

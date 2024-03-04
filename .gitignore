@@ -177,3 +177,7 @@ cron_etl_initial.sh
 xmls/
 
 .DS_Store
+
+# Qdrant
+
+qdrant_data/

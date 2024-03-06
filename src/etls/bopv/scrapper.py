@@ -1,18 +1,17 @@
 import logging as lg
 import tempfile
 import typing as tp
-from datetime import date, datetime
+from datetime import date
 import re
 import random
 
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
-from requests.exceptions import HTTPError
 
 from src.etls.bopv.metadata import BOPVMetadataDocument
 from src.etls.common.scrapper import BaseScrapper
-from src.etls.common.utils import ScrapeError
+from src.etls.common.utils import ScrapperError
 from src.initialize import initialize_logging
 
 
@@ -79,7 +78,7 @@ class BOPVScrapper(BaseScrapper):
         except requests.HTTPError as err:
             raise ValueError(f"Error en la solicitud HTTP: {err}")
         except ValueError as err:
-            raise
+            raise ValueError(f"Error en la solicitud HTTP: {err}")
     
     def download_day(self, day: date) -> tp.List[BOPVMetadataDocument]:
         """Download all the documents for a specific date."""
@@ -99,7 +98,7 @@ class BOPVScrapper(BaseScrapper):
             for block in txt_blocks:
                 titulo = block.find('p', class_='BOPVSumarioTitulo')
                 if not titulo or not titulo.find('a'):
-                    raise ScrapeError("No se pudo encontrar el título o el enlace en uno de los bloques.")            
+                    raise ScrapperError("No se pudo encontrar el título o el enlace en uno de los bloques.")            
                 href = titulo.find('a')['href']
                 url_disposicion = summary_link.rsplit('/', 1)[0] + '/' + href
                 document_data = self.download_document(url_disposicion)
@@ -118,11 +117,9 @@ class BOPVScrapper(BaseScrapper):
                     disposiciones.append(document_data)                    
             return disposiciones 
         except requests.exceptions.RequestException as e:
-            print(f"Error de red o HTTP al intentar acceder a {summary_link}: {e}")
-            raise  
+            raise Exception(f"Error de red o HTTP al intentar acceder a {summary_link}: {e}")
         except Exception as e:
-            print(f"Error inesperado: {e}")
-            raise           
+            raise Exception(f"Error inesperado: {e}")
         
     def download_document(self, url: str) -> BOPVMetadataDocument:
         """
@@ -142,7 +139,7 @@ class BOPVScrapper(BaseScrapper):
             soup = BeautifulSoup(response.content, "html.parser")
             seccion_tag = soup.find("h4", class_="BOPVSeccion")
             if not seccion_tag:
-                raise ScrapeError("No se pudo encontrar la sección requerida.")
+                raise ScrapperError("No se pudo encontrar la sección requerida.")
 
             seccion_text = seccion_tag.get_text(strip=True).upper()
             if seccion_text not in ['DISPOSICIONES GENERALES', 'OTRAS DISPOSICIONES']:
@@ -153,7 +150,7 @@ class BOPVScrapper(BaseScrapper):
             pdf_link_tag = soup.find("li", class_="formatoPdf").find('a')
             
             if not organismo_tag or not content_block or not pdf_link_tag:
-                raise ScrapeError("No se pudo encontrar algunos de los elementos requeridos.")
+                raise ScrapperError("No se pudo encontrar algunos de los elementos requeridos.")
 
             organismo = organismo_tag.get_text(strip=True) if organismo_tag else ""
             base_url = url.rsplit('/', 1)[0] + '/'
@@ -169,6 +166,7 @@ class BOPVScrapper(BaseScrapper):
                 text_cleaned = clean_text(content) 
                 fn.write(text_cleaned)            
             metadata_doc = BOPVMetadataDocument(**{"filepath": fn.name,
+                                                   "identificador": '/'.join(url.split('.')[-2].split("/")[-3:]),
                                                    "departamento": organismo,
                                                    "url_pdf": pdf_url,
                                                    "tipologia": tipologia,                                                 
@@ -177,8 +175,6 @@ class BOPVScrapper(BaseScrapper):
             return metadata_doc
                
         except requests.exceptions.RequestException as e:
-            print(f"Error de red o HTTP al intentar acceder a {url}: {e}")
-            raise
+            raise Exception(f"Error de red o HTTP al intentar acceder a {url}: {e}")
         except Exception as e:
-            print(f"Error inesperado procesando el documento {url}: {e}")
-            raise
+            raise Exception(f"Error de red o HTTP al intentar acceder a {url}: {e}")

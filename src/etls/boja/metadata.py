@@ -1,9 +1,5 @@
-import typing as tp
 from datetime import datetime
 from typing import Optional
-
-from pydantic import BaseModel, validator, Field
-import re
 
 from src.etls.common.metadata import MetadataDocument
 
@@ -21,7 +17,7 @@ class BOJAMetadataDocument(MetadataDocument):
     source_type: str = "Boletin"
 
     # Metadatos
-
+    identificador: str
     departamento: str
     tipologia: str   
 

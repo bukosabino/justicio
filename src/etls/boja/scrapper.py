@@ -1,12 +1,12 @@
 import logging as lg
 import tempfile
 import typing as tp
-from datetime import date, datetime
+from datetime import date
 import re
 
 from src.etls.boja.metadata import BOJAMetadataDocument
 from src.etls.common.scrapper import BaseScrapper
-from src.etls.common.utils import ScrapeError, HTTPRequester
+from src.etls.common.utils import ScrapperError, HTTPRequester
 from src.etls.boja.utils import mes_a_numero, clean_text
 from src.initialize import initialize_logging
 
@@ -41,8 +41,7 @@ class BOJAScrapper(BaseScrapper):
 
             return urls_bojas        
         except Exception as e:
-            print(f"Error inesperado: {e}")
-            raise
+            raise Exception(f"Error inesperado: {e}")
         
     @staticmethod    
     def find_disposiciones(url_boletin):        
@@ -65,10 +64,9 @@ class BOJAScrapper(BaseScrapper):
                     for enlace_final in enlaces_intermedios:
                         enlaces_finales.append(enlace_final.get('href'))                                                         
             else:
-                raise ScrapeError("No se encontró el listado ordenado con las clases especificadas.")          
+                raise ScrapperError("No se encontró el listado ordenado con las clases especificadas.")          
         except Exception as e:
-            print(f"Error inesperado: {e}")
-            raise
+            raise Exception(f"Error inesperado: {e}")
         return enlaces_finales
 
     def _get_summary_link_from_date(self, fecha_busqueda):
@@ -105,8 +103,7 @@ class BOJAScrapper(BaseScrapper):
                                     "extraordinario": False
                                 }]
         except Exception as e:
-            print(f"Error inesperado: {e}")
-            raise
+            raise Exception(f"Error inesperado: {e}")
 
     def download_day(self, day: date) -> tp.List[BOJAMetadataDocument]:
         """Download all the documents for a specific date."""
@@ -123,20 +120,19 @@ class BOJAScrapper(BaseScrapper):
                     document_data = self.download_document(disposicion)
                     if document_data:
                         disposition_summary = {
-                        "url_boletin":boletin['url'],
-                        "url_html":disposicion,
-                        "fecha_disposicion": day.strftime("%Y-%m-%d"),
-                        "anio": str(day.year),
-                        "mes": str(day.month),
-                        "dia": str(day.day),                        
+                            "url_boletin": boletin['url'],
+                            "url_html": disposicion,
+                            "fecha_disposicion": day.strftime("%Y-%m-%d"),
+                            "anio": str(day.year),
+                            "mes": str(day.month),
+                            "dia": str(day.day),
                         }
                         for atributo, valor in disposition_summary.items():
                             setattr(document_data, atributo, valor)
                         disposiciones.append(document_data) 
             return disposiciones 
         except Exception as e:
-            print(f"Error inesperado descargando dia {day}: {e}")
-            raise           
+            raise Exception(f"Error inesperado descargando dia {day}: {e}")
         
     def download_document(self, url: str) -> BOJAMetadataDocument:
         """
@@ -155,7 +151,7 @@ class BOJAScrapper(BaseScrapper):
             cuerpo = soup.find(id="cuerpo", class_="grid_11 contenidos_nivel3 boja_disposicion")        
             cabecera = soup.find(class_="punteado_izquierda cabecera_detalle_disposicion")
             if not cabecera or not cuerpo:
-                raise ScrapeError("No se pudo encontrar la cabecera o el cuerpo del documento")
+                raise ScrapperError("No se pudo encontrar la cabecera o el cuerpo del documento")
             h2 = cabecera.find('h2')
             h5 = cabecera.find('h5')
             h3 = cabecera.find('h3')
@@ -180,6 +176,7 @@ class BOJAScrapper(BaseScrapper):
                 fn.write(text_cleaned)
             logger.info("Scrapped document successfully %s", url)      
             metadata_doc = BOJAMetadataDocument(**{ "filepath": fn.name,
+                                                    "identificador": '/'.join(url.split("/")[-3:]),
                                                     "titulo": titulo,
                                                     "departamento": clean_text(organo_disposicion),
                                                     "url_pdf": enlace_pdf,
@@ -187,5 +184,4 @@ class BOJAScrapper(BaseScrapper):
                                                     })
             return metadata_doc              
         except Exception as e:
-            print(f"Error inesperado procesando el documento {url}: {e}")
-            raise
+            raise Exception(f"Error inesperado procesando el documento {url}: {e}")

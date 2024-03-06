@@ -1,13 +1,7 @@
-import typing as tp
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, validator, Field
-import re
-
 from src.etls.common.metadata import MetadataDocument
-
-
 
 
 class BOPVMetadataDocument(MetadataDocument):
@@ -21,9 +15,9 @@ class BOPVMetadataDocument(MetadataDocument):
     source_type: str = "Boletin"
 
     # Metadatos
-
+    identificador: str
     departamento: Optional[str] = None 
-    tipologia: str   
+    tipologia: str
 
     # Links
     titulo: Optional[str] = None

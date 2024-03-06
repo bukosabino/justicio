@@ -28,35 +28,38 @@ class TextLoader(BaseLoader):
             text = f.read()
         return [Document(page_content=text, metadata=self.metadata)]
 
-class ScrapeError(Exception):
+
+class ScrapperError(Exception):
     """
-    Excepción personalizada para errores de scrapeo.
+    Custom exception for scraping errors.
     """
 
     def __init__(self, message="Error durante el proceso de scraping", *args, **kwargs):
         """
-        Inicializa la excepción con un mensaje de error personalizado.
+        Initializes the exception with a custom error message.
 
-        :param message: Mensaje de error que describe el fallo.
-        :param args: Argumentos posicionales adicionales.
-        :param kwargs: Argumentos de palabra clave adicionales.
+        :param message: Error message describing the failure.
+        :param args: Additional positional arguments.
+        :param kwargs: Additional keyword arguments.
         """
         super().__init__(message, *args, **kwargs)
         self.message = message
 
     def __str__(self):
         """
-        Devuelve una representación en string de la excepción, que incluye el mensaje de error.
+        Returns a string representation of the exception, including the error message.
         """
-        return f"ScrapeError: {self.message}"
-    
+        return f"ScrapperError: {self.message}"
+
+
 class HTTPRequestException(Exception):
     """
-    Excepción para errores ocurridos durante las solicitudes HTTP realizadas por HTTPRequester.
+    Exception for errors occurring during HTTP requests made by HTTPRequester.
     """
-    def __init__(self, message="Error en la solicitud HTTP", *args):
+    def __init__(self, message="HTTP request error", *args):
         super().__init__(message, *args)
-        
+
+
 class HTTPRequester:
     user_agents = [
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36",
@@ -77,32 +80,31 @@ class HTTPRequester:
     @classmethod
     def get_random_user_agent(cls):
         """
-        Selecciona y devuelve un User-Agent aleatorio de la lista de user_agents.
+        Selects and returns a random User-Agent from the list of user_agents.
         """
         return random.choice(cls.user_agents)
 
     @classmethod
     def get_headers(cls):
         """
-        Genera y devuelve headers incluyendo un User-Agent aleatorio.
+        Generates and returns headers including a random User-Agent.
         """
         headers = cls.default_headers.copy()
         headers["User-Agent"] = cls.get_random_user_agent()
         return headers
 
     @staticmethod
-    def get_soup(url, timeout=10):  
+    def get_soup(url, timeout=10, markup='html.parser'):
         """
-        Realiza una solicitud HTTP GET al URL proporcionado, utilizando headers aleatorios,
-        y devuelve un objeto BeautifulSoup si la respuesta es exitosa. Si hay un error
-        o se supera el tiempo de espera, lanza HTTPRequestException.
+        Performs an HTTP GET request to the provided URL, using random headers, and returns a BeautifulSoup
+        object if the response is successful. If there is an error or timeout, it throws HTTPRequestException.
         """
         headers = HTTPRequester.get_headers()
         try:
             response = requests.get(url, headers=headers, timeout=timeout)
             response.raise_for_status()
-            return BeautifulSoup(response.content, 'html.parser')
+            return BeautifulSoup(response.content, markup)
         except Timeout as e:
-            raise HTTPRequestException(f"La solicitud HTTP excedió el tiempo de espera: {e}")
+            raise HTTPRequestException(f"HTTP request timed out: {e}")
         except requests.RequestException as e:
-            raise HTTPRequestException(f"Error al realizar la solicitud HTTP: {e}")
+            raise HTTPRequestException(f"HTTP request failed: {e}")

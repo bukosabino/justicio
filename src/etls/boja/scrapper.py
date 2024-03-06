@@ -148,6 +148,9 @@ class BOJAScrapper(BaseScrapper):
         texto_completo = ""
         soup = HTTPRequester.get_soup(url)
         try:
+            acceso_restringido = soup.find('h1', class_='title', string='Texto de acceso restringido')
+            if acceso_restringido:
+                return None            
             cuerpo = soup.find(id="cuerpo", class_="grid_11 contenidos_nivel3 boja_disposicion")        
             cabecera = soup.find(class_="punteado_izquierda cabecera_detalle_disposicion")
             if not cabecera or not cuerpo:

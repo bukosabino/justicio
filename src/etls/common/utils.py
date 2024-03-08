@@ -94,7 +94,7 @@ class HTTPRequester:
         return headers
 
     @staticmethod
-    def get_soup(url, timeout=10, markup='html.parser'):
+    def get_soup(url, timeout=30, markup='html.parser'):
         """
         Performs an HTTP GET request to the provided URL, using random headers, and returns a BeautifulSoup
         object if the response is successful. If there is an error or timeout, it throws HTTPRequestException.

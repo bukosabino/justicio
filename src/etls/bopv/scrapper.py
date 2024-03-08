@@ -84,7 +84,7 @@ class BOPVScrapper(BaseScrapper):
         """Download all the documents for a specific date."""
         try:
             logger = lg.getLogger(self.download_day.__name__)
-            logger.info("Downloading BOCM content for day %s", day)
+            logger.info("Downloading BOPV content for day %s", day)
             summary_link = self._get_summary_link_from_date(day)
             if summary_link is None:
                 logger.info(f"No hay contenido disponible para el día {day}")

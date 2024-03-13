@@ -7,6 +7,7 @@ from src.etls.bopz.load import today as bopz_today
 from src.etls.bocm.load import today as bocm_today
 from src.etls.bopv.load import today as bopv_today
 from src.etls.boja.load import today as boja_today
+from src.etls.boa.load import today as boa_today
 from src.initialize import initialize_app
 
 
@@ -18,6 +19,7 @@ schedule.every().day.at("11:05").do(bopz_today, init_objects=INIT_OBJECTS)
 schedule.every().day.at("11:10").do(bocm_today, init_objects=INIT_OBJECTS)
 schedule.every().day.at("11:15").do(bopv_today, init_objects=INIT_OBJECTS)
 schedule.every().day.at("11:20").do(boja_today, init_objects=INIT_OBJECTS)
+schedule.every().day.at("11:25").do(boa_today, init_objects=INIT_OBJECTS)
 # TODO: monthly jobs
 
 while True:

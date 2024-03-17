@@ -141,7 +141,7 @@ def _init_embeddings(config_loader):
         return HuggingFaceHubEmbeddings(model=model)
     else:
         return HuggingFaceEmbeddings(
-            model_name=config_loader["embeddings_model_name"],
+            model_name=model,
             model_kwargs={"device": "cpu"},
         )
 

@@ -18,13 +18,74 @@ from src.initialize import initialize_logging
 initialize_logging()
 
 
-def _remove_html_tags(text):
+def _remove_html_tags(text: str) -> str:
     parser = etree.HTMLParser()
     tree = etree.fromstring(text, parser)
     clean_text = etree.tostring(tree, encoding="unicode", method='text') 
     return clean_text.strip()
 
 
+def _extract_metadata(doc: dict) -> tp.Dict:
+    metadata_dict = {}
+    
+    try:
+        metadata_dict["identificador"] = doc["DOCN"]
+    except KeyError:
+        pass
+
+    try:
+        metadata_dict["numero_boletin"] = doc["Numeroboletin"]
+    except KeyError:
+        pass
+    
+    try:
+        metadata_dict["departamento"] = doc["Emisor"]
+    except KeyError:
+        pass
+    
+    try:
+        metadata_dict["url_pdf"] = doc["UrlPdf"].split('´`')[0][1:]
+    except KeyError:
+        pass
+    
+    try:
+        metadata_dict["url_boletin"] = doc["UrlBCOM"].split('´`')[0][1:]
+    except KeyError:
+        pass
+    
+    try:
+        metadata_dict["seccion"] = doc["Seccion"]
+    except KeyError:
+        pass
+
+    try:
+        metadata_dict["titulo"] = doc["Titulo"]
+    except KeyError:
+        pass
+    
+    try:
+        metadata_dict["subseccion"] = doc["Subseccion"]
+    except KeyError:
+        pass
+    
+    try:
+        metadata_dict["codigo_materia"] = doc["CodigoMateria"]
+    except KeyError:
+        pass
+    
+    try:
+        metadata_dict["rango"] = doc["Rango"]
+    except KeyError:
+        pass
+
+    try:
+        metadata_dict["fecha_disposicion"] = doc["Fechadisposicion"]
+    except KeyError:
+        pass
+    
+    return metadata_dict 
+   
+    
 class BOAScrapper(BaseScrapper):
     def __init__(self):
         self.base_url = "https://www.boa.aragon.es/cgi-bin/EBOA/BRSCGI"
@@ -71,53 +132,16 @@ class BOAScrapper(BaseScrapper):
             result_json = json.loads(raw_result)
             disposiciones = []
             for doc in result_json:
-                content = doc['Texto']
-                numero_boletin = doc['Numeroboletin']
-                identificador = doc['DOCN']
-                departamento = doc['Emisor']
-                url_pdf_raw = doc['UrlPdf']
-                url_pdf = url_pdf_raw.split('´`')[0][1:]
-                seccion = doc['Seccion']
-                if not content or not numero_boletin or not identificador or not departamento or not url_pdf or not seccion:
-                    raise ScrapperError("No se pudo encontrar alguno de los elementos requeridos.")
-                
-                clean_text = _remove_html_tags(content)
-
-                with tempfile.NamedTemporaryFile("w", delete=False, encoding='utf-8') as fn:
-                    fn.write(clean_text)           
-                document_data = BOAMetadataDocument(**{"filepath": fn.name,
-                                                       "numero_boletin": numero_boletin,
-                                                       "identificador": identificador,
-                                                       "departamento": departamento,
-                                                       "url_pdf": url_pdf,
-                                                       "seccion": seccion, 
-                                                       })
-                titulo = doc['Titulo']
-                url_boletin_raw = doc['UrlBCOM'] 
-                url_boletin = url_boletin_raw.split('´`')[0][1:]
-                subseccion = doc['Subseccion']
-                codigo_materia = doc['CodigoMateria']
-                rango = doc['Rango']
-                fecha_disposicion = doc['Fechadisposicion']
-
-                if not titulo:
-                    raise ScrapperError("No se pudo encontrar el título en uno de los bloques.") 
-                
-                disposition_summary = {
-                    "titulo": titulo,                        
-                    "url_boletin": url_boletin,
-                    "subseccion": subseccion,
-                    "codigo_materia": codigo_materia,
-                    "rango": rango,
-                    "fecha_disposicion": fecha_disposicion,
+                metadata_doc = self.download_document(json.dumps(doc))
+                fecha_publicacion_atributos = {
                     "fecha_publicacion": day.strftime("%Y-%m-%d"), 
                     "anio": str(day.year),
                     "mes": str(day.month),
                     "dia": str(day.day),
                 }
-                for atributo, valor in disposition_summary.items():
-                        setattr(document_data, atributo, valor)
-                disposiciones.append(document_data)
+                for atributo, valor in fecha_publicacion_atributos.items():
+                        setattr(metadata_doc, atributo, valor)
+                disposiciones.append(metadata_doc)
             return disposiciones
         except requests.exceptions.RequestException as e:
             raise Exception(f"Error de red o HTTP al intentar acceder a {self.base_url}: {e}")
@@ -126,8 +150,28 @@ class BOAScrapper(BaseScrapper):
         
 
     def download_document(self, url: str) -> MetadataDocument:
-        """ En este caso, dado que al acceder a la url diaria, el BOA devuelve el texto de todos los
-            boletines en un JSON, no es necesario hacer uso de un método download_document(). 
-            De todas formas, se debe incluir para el correcto funcionamiento del programa, ya que
-            la clase BaseScrapper requiere que exista este método."""
-        pass
+        '''
+        En BOAScrapper, a partir de la url diaria (en la función download_day), 
+        se recibe directamente el contenido de todos los boletines. Por lo tanto,
+        no hace falta scrapear cada uno de las publicaciones a partir de su url.
+        
+        Para ser consistentes con el resto de scrappers, se mantiene el método
+        download_document, pero en este caso en vez de la url se le pasará una 
+        string con el contenido y los metadatos, tal y como se recibe de la base_url
+        '''
+        
+        logger = lg.getLogger(self.download_document.__name__)
+        doc = json.loads(url) 
+        url_pdf_raw = doc['UrlPdf']
+        url_pdf = url_pdf_raw.split('´`')[0][1:]
+        logger.info("Scrapping document: %s", url_pdf)
+        content = doc['Texto']
+        clean_text = _remove_html_tags(content)
+        with tempfile.NamedTemporaryFile("w", delete=False, encoding='utf-8') as fn:
+            fn.write(clean_text)           
+        try:
+            metadata_doc = BOAMetadataDocument(filepath=fn.name,**_extract_metadata(doc))
+        except:
+            raise ScrapperError("No se pudo encontrar alguno de los elementos requeridos.")
+        logger.info("Scrapped document successfully %s", url_pdf)
+        return metadata_doc

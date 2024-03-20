@@ -4,6 +4,7 @@ import typing as tp
 from datetime import date
 import random
 import json 
+from lxml import etree
 
 import requests
 
@@ -36,7 +37,12 @@ class BOAScrapper(BaseScrapper):
             "User-Agent": random.choice(self.user_agents),
         }    
 
-
+    def _remove_html_tags(self, text):
+        parser = etree.HTMLParser()
+        tree = etree.fromstring(text, parser)
+        clean_text = etree.tostring(tree, encoding="unicode", method='text') 
+        return clean_text.strip()
+    
     def download_day(self, day: date) -> tp.List[BOAMetadataDocument]:
         """Download all the documents for a specific date."""
         try:
@@ -73,7 +79,7 @@ class BOAScrapper(BaseScrapper):
                 if not content or not numero_boletin or not identificador or not departamento or not url_pdf or not seccion:
                     raise ScrapperError("No se pudo encontrar alguno de los elementos requeridos.")
                 
-                clean_text = content.replace('<br/>', '')
+                clean_text = self._remove_html_tags(content)
 
                 with tempfile.NamedTemporaryFile("w", delete=False, encoding='utf-8') as fn:
                     fn.write(clean_text)           

@@ -118,7 +118,7 @@ class BOAScrapper(BaseScrapper):
                      'OUTPUTMODE': 'JSON',
                      'SEPARADOR':'',
                      'PUBL-C': day.strftime("%Y%m%d"),
-                     'SECC-C':'BOA%2Bo%2BDisposiciones%2Bo%2BJusticia%2Bo%2BAnuncios'
+                     'SECC-C':'BOA%2Bo%2BDisposiciones%2Bo%2BJusticia'
                      # versión completa (todas las secciones, incluyendo personal, etc):
                      # 'SECC-C':'BOA%2Bo%2BDisposiciones%2Bo%2BPersonal%2Bo%2BAcuerdos%2Bo%2BJusticia%2Bo%2BAnuncios' 
                      }

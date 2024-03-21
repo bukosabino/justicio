@@ -79,8 +79,7 @@ def _extract_metadata(doc: dict) -> tp.Dict:
         pass
 
     try:
-        fecha_disp_raw = doc["Fechadisposicion"]
-        fecha_disposicion = fecha_disp_raw[0:4]+"-"+fecha_disp_raw[4:6]+"-"+fecha_disp_raw[6:8]
+        fecha_disposicion = datetime.strptime(doc["Fechadisposicion"], "%Y%m%d").strftime("%Y-%m-%d")
         metadata_dict["fecha_disposicion"] = fecha_disposicion
     except KeyError:
         pass

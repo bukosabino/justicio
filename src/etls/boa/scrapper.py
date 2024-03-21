@@ -39,7 +39,7 @@ def _extract_metadata(doc: dict) -> tp.Dict:
         pass
     
     try:
-        metadata_dict["departamento"] = doc["Emisor"]
+        metadata_dict["departamento"] = doc["Emisor"].capitalize()
     except KeyError:
         pass
     
@@ -74,12 +74,14 @@ def _extract_metadata(doc: dict) -> tp.Dict:
         pass
     
     try:
-        metadata_dict["rango"] = doc["Rango"]
+        metadata_dict["rango"] = doc["Rango"].capitalize()
     except KeyError:
         pass
 
     try:
-        metadata_dict["fecha_disposicion"] = doc["Fechadisposicion"]
+        fecha_disp_raw = doc["Fechadisposicion"]
+        fecha_disposicion = fecha_disp_raw[0:4]+"-"+fecha_disp_raw[4:6]+"-"+fecha_disp_raw[6:8]
+        metadata_dict["fecha_disposicion"] = fecha_disposicion
     except KeyError:
         pass
     
@@ -135,9 +137,9 @@ class BOAScrapper(BaseScrapper):
                 metadata_doc = self.download_document(json.dumps(doc))
                 fecha_publicacion_atributos = {
                     "fecha_publicacion": day.strftime("%Y-%m-%d"), 
-                    "anio": str(day.year),
-                    "mes": str(day.month),
-                    "dia": str(day.day),
+                    "anio": day.strftime("%Y"),
+                    "mes": day.strftime("%m"),
+                    "dia": day.strftime("%d"),
                 }
                 for atributo, valor in fecha_publicacion_atributos.items():
                         setattr(metadata_doc, atributo, valor)

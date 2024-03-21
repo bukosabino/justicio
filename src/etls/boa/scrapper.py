@@ -1,7 +1,7 @@
 import logging as lg
 import tempfile
 import typing as tp
-from datetime import date
+from datetime import date, datetime
 import random
 import json 
 from lxml import etree

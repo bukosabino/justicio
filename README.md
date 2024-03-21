@@ -82,7 +82,7 @@ the most similar documents returned by the embedding database.
 
 # Deploy your own service
 
-Check `deployment_guide.md` file
+Check [doc/deployment_guide.md](https://github.com/bukosabino/justicio/blob/main/doc/deployment_guide.md) file
 
 # Want to help develop the project?
 

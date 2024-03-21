@@ -1,52 +1,37 @@
-# How to deploy the service in a remote/cloud computer
+# How to deploy the service in local
 
-## 1. Prepare your vector database
+## 1. Prepare your vector database in local
 
-At this moment we are working with pinecone as vector database, so, please create an account and an index. Check [the pinecone documentation](https://docs.pinecone.io/docs/overview)
+At this moment, we are working with Qdrant as vector database.
 
-Once you have your pinecone index, please update the `config/config.yaml` :
+Official doc: https://qdrant.tech/documentation/quick-start/
 
-* vector_store: use the name of the pinecone index that you choose.
-
-Export environment variables:
+### Download the latest Qdrant image from Dockerhub:
 
 ```
-export APP_PATH="."
-export SENDGRID_API_KEY=<your_sendgrid_api_key>
-export OPENAI_API_KEY=<your_open_api_key>
-export TOKENIZERS_PARALLELISM=false
-export TAVILY_API_KEY=<your_tavily_api_key>
-export QDRANT_API_KEY="<your_qdrant_api_key>"
-export QDRANT_API_URL="<your_qdrant_api_url>"
+docker pull qdrant/qdrant
 ```
 
-Load BOE documents into your vector database (depending on the selected data, may take a few minutes)
+### Run the service:
 
 ```
-python -m src.etls.boe.load dates collection_name 2024/01/01 2024/01/31
+docker run -p 6333:6333 -p 6334:6334 \
+    -v $(pwd)/qdrant_storage:/qdrant/storage:z \
+    qdrant/qdrant
 ```
 
-If you want to update the vector database on a daily basis (BOE publishes new documents every day), run this file as a scheduled job (e.g. with CRON).
+* REST API: localhost:6333
+* Web UI: localhost:6333/dashboard
+
+## 2. Prepare Justicio
+
+### Clone the code:
 
 ```
-python -m src.etls.boe.load today collection_name
+git clone git@github.com:bukosabino/justicio.git
 ```
 
-If you want to update the vector database on a daily basis (BOE publishes new documents every day), run this file with schedule:
-
-```
-python -m src.etls.boe.schedule
-```
-
-## 2. Deploy the service
-
-Clone the code:
-
-```
-git clone git@github.com:bukosabino/ia-boe.git
-```
-
-Install the requirements:
+### Install the requirements:
 
 ```
 sudo apt install python3-virtualenv
@@ -55,33 +40,36 @@ source venv3.10/bin/activate
 pip install -r requirements.txt
 ```
 
-Export environment variables:
+### Export environment variables:
+
+Note: You need to get an API key for OpenAI and another for Sendgrid.
 
 ```
 export APP_PATH="."
 export SENDGRID_API_KEY=<your_sendgrid_api_key>
 export OPENAI_API_KEY=<your_open_api_key>
 export TOKENIZERS_PARALLELISM=false
-export TAVILY_API_KEY=<your_tavily_api_key>
-export QDRANT_API_KEY="<your_qdrant_api_key>"
-export QDRANT_API_URL="<your_qdrant_api_url>"
+export TAVILY_API_KEY=""
+export QDRANT_API_KEY=""
+export QDRANT_API_URL="http://0.0.0.0:6333"
 ```
 
-Run the service
+### Add some vector to the vector database
+
+Load BOE documents into your vector database (depending on the selected data, may take a few minutes).
 
 ```
-nohup uvicorn src.service.main:APP --host=0.0.0.0 --port=5001 --workers=2 --timeout-keep-alive=125 --log-level=info > logs/output.out 2>&1 &
+python -m src.etls.boe.load dates 2024/01/01 2024/01/07
+```
+
+## 3. Run Justicio in local
+
+```
+uvicorn src.service.main:APP --host=0.0.0.0 --port=5001 --workers=1 --timeout-keep-alive=125 --log-level=info
 ```
 
 In the browser
 
 ```
 http://<your.ip>:5001/docs
-```
-
-Monitor the logs of the system
-
-```
-tail -n 20 output.out
-tail -f output.out
 ```

@@ -6,7 +6,7 @@ import pinecone
 import yaml
 from langchain.chains import RetrievalQA
 from langchain.chat_models import ChatOpenAI
-from langchain.embeddings import HuggingFaceEmbeddings
+from langchain.embeddings import HuggingFaceEmbeddings, HuggingFaceHubEmbeddings
 from langchain.prompts import (
     ChatPromptTemplate,
     HumanMessagePromptTemplate,
@@ -82,10 +82,7 @@ def _init_vector_store_pinecone(config_loader):
     )
     index_name = config_loader["vector_store_index_name"]
     index = pinecone.Index(index_name)
-    embeddings = HuggingFaceEmbeddings(
-        model_name=config_loader["embeddings_model_name"],
-        model_kwargs={"device": "cpu"},
-    )
+    embeddings = _init_embeddings(config_loader=config_loader)
     vector_store = Pinecone(index, embeddings.embed_query, "text")
     logger.info(pinecone.describe_index(index_name))
     logger.info(index.describe_index_stats())
@@ -103,10 +100,7 @@ def _init_vector_store_supabase(config_loader):
         supabase_key=os.environ.get("SUPABASE_API_KEY"),
         options=ClientOptions(postgrest_client_timeout=60),
     )
-    embeddings = HuggingFaceEmbeddings(
-        model_name=config_loader["embeddings_model_name"],
-        model_kwargs={"device": "cpu"},
-    )
+    embeddings = _init_embeddings(config_loader)
     vector_store = StandardSupabaseVectorStore(
         client=supabase_client,
         embedding=embeddings,
@@ -116,7 +110,6 @@ def _init_vector_store_supabase(config_loader):
     logger.info("Initialized vector store")
     return vector_store
 
-
 def _init_vector_stores_qdrant(config_loader):
     logger = lg.getLogger(_init_vector_stores_qdrant.__name__)
     logger.info("Initializing vector stores")
@@ -125,10 +118,7 @@ def _init_vector_stores_qdrant(config_loader):
         api_key=os.environ["QDRANT_API_KEY"],
         prefer_grpc=True,
     )
-    embeddings = HuggingFaceEmbeddings(
-        model_name=config_loader["embeddings_model_name"],
-        model_kwargs={"device": "cpu"},
-    )
+    embeddings = _init_embeddings(config_loader)
     vector_stores = {}
     for collection_name in config_loader["collections"]:
         if not _exists_collection(qdrant_client, collection_name):
@@ -144,6 +134,16 @@ def _init_vector_stores_qdrant(config_loader):
         vector_stores[collection_name] = Qdrant(qdrant_client, collection_name, embeddings)
         logger.info("Initialized vector store for collection [%s]", collection_name)
     return vector_stores
+
+def _init_embeddings(config_loader):
+    model: str = config_loader["embeddings_model_name"]
+    if model.startswith('http'):
+        return HuggingFaceHubEmbeddings(model=model)
+    else:
+        return HuggingFaceEmbeddings(
+            model_name=model,
+            model_kwargs={"device": "cpu"},
+        )
 
 
 def _init_openai_client():

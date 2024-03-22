@@ -15,9 +15,7 @@ docker pull qdrant/qdrant
 ### Run the service:
 
 ```
-docker run -p 6333:6333 -p 6334:6334 \
-    -v $(pwd)/qdrant_storage:/qdrant/storage:z \
-    qdrant/qdrant
+docker run -p 6333:6333 -p 6334:6334 -v $(pwd)/justicio/config/qdrant_local.yaml:/qdrant/config/production.yaml -v $(pwd)/qdrant_storage:/qdrant/storage:z qdrant/qdrant
 ```
 
 * REST API: localhost:6333
@@ -50,8 +48,8 @@ export SENDGRID_API_KEY=<your_sendgrid_api_key>
 export OPENAI_API_KEY=<your_open_api_key>
 export TOKENIZERS_PARALLELISM=false
 export TAVILY_API_KEY=""
-export QDRANT_API_KEY=""
-export QDRANT_API_URL="http://0.0.0.0:6333"
+export QDRANT_API_KEY="823e071f67c198cc05c73f8bd4580865e6a8819a1f3fe57d2cd49b5c892a5233"
+export QDRANT_API_URL="http://localhost:6333"
 ```
 
 ### Add some vector to the vector database

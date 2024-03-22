@@ -156,10 +156,10 @@ def _init_openai_client():
     return client
 
 
-def _exists_collection(client, collection_name):
+def _exists_collection(qdrant_client, collection_name):
     logger = lg.getLogger(_exists_collection.__name__)
     try:
-        client.get_collection(collection_name=collection_name)
+        qdrant_client.get_collection(collection_name=collection_name)
         return True
     except:
         logger.warn("Collection [%s] doesn't exist", collection_name)

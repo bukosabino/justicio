@@ -15,7 +15,7 @@ docker pull qdrant/qdrant
 ### Run the service:
 
 ```
-docker run -p 6333:6333 -p 6334:6334 -v $(pwd)/justicio/config/qdrant_local.yaml:/qdrant/config/production.yaml -v $(pwd)/qdrant_storage:/qdrant/storage:z qdrant/qdrant
+docker run -p 6333:6333 -p 6334:6334 -v $(pwd)/config/example_qdrant_local.yaml:/qdrant/config/production.yaml -v $(pwd)/qdrant_storage:/qdrant/storage:z qdrant/qdrant
 ```
 
 * REST API: localhost:6333

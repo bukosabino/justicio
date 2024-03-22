@@ -1,3 +1,6 @@
+# You can create your own config file
+# You can generate your keys using your CLI:
+# openssl rand -hex 32
 service:
   api_key: 823e071f67c198cc05c73f8bd4580865e6a8819a1f3fe57d2cd49b5c892a5233
   read_only_api_key: d1aab4f05ae4fd7f4e4b8d9e5924469494ebb7897aed46cf2b0df0915410e0b0

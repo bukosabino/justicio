@@ -16,7 +16,7 @@ schedule==1.2.1
 langchain==0.0.305
 # langchainplus-sdk==0.0.20
 langsmith==0.0.41
-qdrant-client==1.5.4
+qdrant-client==1.8.0
 supabase==1.0.2
 pinecone-client==2.2.2
 sentence_transformers==2.2.2

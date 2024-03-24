@@ -130,6 +130,7 @@ class BOAScrapper(BaseScrapper):
                 return []
             if response.status_code != 200:
                 response.raise_for_status() 
+            raw_result = raw_result.replace('\\', '\\\\')
             result_json = json.loads(raw_result)
             disposiciones = []
             for doc in result_json:

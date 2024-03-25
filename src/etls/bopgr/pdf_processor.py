@@ -1,0 +1,131 @@
+import logging as lg
+import os
+import tempfile
+import typing as tp
+
+import fitz
+import requests
+from pydantic import ValidationError
+
+from src.etls.bopgr.metadata import BOPGRMetadataDocument
+from src.etls.bopgr.processor.line_processor import MetadataProcessor, CleanUpProcessor, LineProcessor
+
+
+def pdf_download(url, temp_directory):
+    """
+    Download a PDF file from a given URL.
+
+    Args:
+        url (str): The URL of the PDF file.
+        temp_directory (str): The temporary directory to store the downloaded file.
+
+    Returns:
+        str: The path to the downloaded PDF file or None if the download fails.
+    """
+    logger = lg.getLogger(pdf_download.__name__)
+    response = requests.get(url)
+
+    # Bad server implementation, returns 200 if file does not exist.
+    if response.status_code == 200 and len(response.content) > 0:
+        with tempfile.NamedTemporaryFile(dir=temp_directory, suffix=".pdf", delete=False) as temp_pdf:
+            temp_pdf.write(response.content)
+            pdf_path = temp_pdf.name
+            logger.info(f"Downloaded PDF from {url} to {pdf_path}.")
+        return pdf_path
+    else:
+        logger.warning(f"Can not download the URL {url}. Status code: {response.status_code}")
+        return None
+
+
+def text_extract(pdf_path: str, temp_directory: str):
+    """
+    Download a PDF file from a given URL.
+
+    :param str url: The URL of the PDF file.
+    :param str temp_directory: The temporary directory to store the downloaded file.
+
+    :return: The path to the downloaded PDF file or None if the download fails.
+    :rtype: str or None
+    """
+    logger = lg.getLogger(text_extract.__name__)
+    with fitz.open(pdf_path) as doc:
+        text = chr(12).join([page.get_text() for page in doc])
+    logger.debug(f"PDF {pdf_path} has been extracted: \n{text}\n")
+
+    fd, text_path = tempfile.mkstemp(dir=temp_directory, suffix=".txt")
+    with os.fdopen(fd, 'w', encoding='utf-8') as temp_text:
+        temp_text.write(text)
+        logger.info(f"PDF {pdf_path} has been stored as text in {text_path}.")
+    return text_path
+
+
+def process_bulletin(text_path:str,
+                     metadata: dict,
+                     general_metadata_processors: tp.List[MetadataProcessor],
+                     content_metadata_processors: tp.List[MetadataProcessor],
+                     clean_up_processors: tp.List[CleanUpProcessor],
+                     skip_processors: tp.List[LineProcessor],
+                     new_content_detector: LineProcessor,
+                     general_metadata_processor_max_line: int = 15,
+                     ) -> tp.List[BOPGRMetadataDocument]:
+    """
+    Process a bulletin, extracting metadata and relevant content.
+
+    :param str text_path: The path to the text file containing the bulletin content.
+    :param dict metadata: Metadata dictionary to be populated.
+    :param List[MetadataProcessor] general_metadata_processors: List of processors for extracting metadata.
+    :param List[MetadataProcessor] content_metadata_processors: List of processors for extracting metadata from content.
+    :param List[CleanUpProcessor] clean_up_processors: List of processors for cleaning up content.
+    :param List[LineProcessor] skip_processors: List of processors for lines that should be skipped.
+    :param LineProcessor new_content_detector: Processor for detecting new content.
+    :param int general_metadata_processor_max_line: Max line number to look for metadata processors.
+
+    :return: List of BOPGRMetadataDocument objects representing processed bulletins.
+    :rtype: List[BOPGRMetadataDocument]
+    """
+    logger = lg.getLogger(process_bulletin.__name__)
+    metadata_documents = []
+    new_content = False
+    with open(text_path, 'r', encoding='utf-8') as file:
+        content = None
+        for index, line in enumerate(file):
+            if index < general_metadata_processor_max_line:
+                for processor in general_metadata_processors:
+                    if processor.test(line):
+                        metadata = metadata | processor.get_metadata(line)
+                        break
+                    continue
+
+            if any(skip_line.test(line) for skip_line in skip_processors):
+                continue
+
+            if new_content_detector.test(line):
+                new_content = True
+                if content:
+                    try:
+                        content_metadata = _get_content_metadata(content, content_metadata_processors,metadata.copy())
+                        metadata_documents.append(content_metadata)
+                    except ValidationError:
+                        logger.exception("Error processing content. Check edict previous to '%s'", line)
+                content = ""
+
+            if new_content:
+                for processor in clean_up_processors:
+                    if processor.test(line):
+                        line = processor.clean(line)
+                content += line
+        if content:
+            try:
+                content_metadata = _get_content_metadata(content, content_metadata_processors,metadata.copy())
+                metadata_documents.append(content_metadata)
+            except ValidationError:
+                logger.exception("Error processing content. Check last edict.")
+    return metadata_documents
+
+
+def _get_content_metadata(content, content_metadata_processors, content_metadata) -> tp.Optional[BOPGRMetadataDocument]:
+    for processor in content_metadata_processors:
+        if processor.test(content):
+            content_metadata = content_metadata | processor.get_metadata(content)
+    return BOPGRMetadataDocument(materia=content, **content_metadata)
+

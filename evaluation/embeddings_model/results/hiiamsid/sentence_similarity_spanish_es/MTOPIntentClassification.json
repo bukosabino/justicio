@@ -1,0 +1,25 @@
+{
+  "dataset_revision": "ae001d0e6b1228650b7bd1c2c65fb50ad11a8aba",
+  "mteb_dataset_name": "MTOPIntentClassification",
+  "mteb_version": "1.1.1",
+  "test": {
+    "es": {
+      "accuracy": 0.6520013342228153,
+      "accuracy_stderr": 0.01046009626954406,
+      "f1": 0.4574064160214279,
+      "f1_stderr": 0.012462086626021643,
+      "main_score": 0.6520013342228153
+    },
+    "evaluation_time": 82.96
+  },
+  "validation": {
+    "es": {
+      "accuracy": 0.6493123772102162,
+      "accuracy_stderr": 0.01208335770659423,
+      "f1": 0.4230617448088956,
+      "f1_stderr": 0.011546084342406499,
+      "main_score": 0.6493123772102162
+    },
+    "evaluation_time": 74.52
+  }
+}

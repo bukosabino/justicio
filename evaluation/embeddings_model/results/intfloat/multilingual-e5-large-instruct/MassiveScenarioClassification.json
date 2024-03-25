@@ -1,0 +1,25 @@
+{
+  "dataset_revision": "7d571f92784cd94a019292a1f45445077d0ef634",
+  "mteb_dataset_name": "MassiveScenarioClassification",
+  "mteb_version": "1.1.1",
+  "test": {
+    "es": {
+      "accuracy": 0.7407868190988567,
+      "accuracy_stderr": 0.0162567570937746,
+      "f1": 0.7444976382087986,
+      "f1_stderr": 0.01654090629042849,
+      "main_score": 0.7407868190988567
+    },
+    "evaluation_time": 67.57
+  },
+  "validation": {
+    "es": {
+      "accuracy": 0.7435317265125431,
+      "accuracy_stderr": 0.018487507836732888,
+      "f1": 0.7454619728615854,
+      "f1_stderr": 0.018304112374084507,
+      "main_score": 0.7435317265125431
+    },
+    "evaluation_time": 53.32
+  }
+}

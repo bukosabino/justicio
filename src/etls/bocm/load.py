@@ -5,6 +5,7 @@ import typer
 from src.email.send_email import send_email
 from src.etls.bocm.scrapper import BOCMScrapper
 from src.etls.common.etl import ETL
+from src.etls.utils import catch_exceptions
 from src.etls.bocm.defs import COLLECTION_NAME
 from src.initialize import initialize_app
 
@@ -13,6 +14,7 @@ app = typer.Typer()
 
 
 @app.command()
+@catch_exceptions(cancel_on_failure=True)
 def today(init_objects=None):
     if init_objects is None:
         init_objects = initialize_app()

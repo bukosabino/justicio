@@ -1,5 +1,7 @@
 import functools
 
+import schedule
+
 
 def catch_exceptions(cancel_on_failure=False):
     def catch_exceptions_decorator(job_func):

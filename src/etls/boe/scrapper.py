@@ -99,7 +99,7 @@ def _list_links_day(url: str) -> tp.List[str]:
     """
     logger = lg.getLogger(_list_links_day.__name__)
     logger.info("Scrapping day: %s", url)
-    response = requests.get(url)
+    response = requests.get(url, timeout=30)
     response.raise_for_status()
     soup = BeautifulSoup(response.text, "lxml")
     id_links = [
@@ -149,7 +149,7 @@ class BOEScrapper(BaseScrapper):
         """
         logger = lg.getLogger(self.download_document.__name__)
         logger.info("Scrapping document: %s", url)
-        response = requests.get(url)
+        response = requests.get(url, timeout=30)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, "lxml")
         with tempfile.NamedTemporaryFile("w", delete=False) as fn:

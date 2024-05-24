@@ -82,10 +82,7 @@ def _init_vector_store_pinecone(config_loader):
     )
     index_name = config_loader["vector_store_index_name"]
     index = pinecone.Index(index_name)
-    embeddings = HuggingFaceEmbeddings(
-        model_name=config_loader["embeddings_model_name"],
-        model_kwargs={"device": "cpu"},
-    )
+    embeddings = _load_model_embedding(config_loader)
     vector_store = Pinecone(index, embeddings.embed_query, "text")
     logger.info(pinecone.describe_index(index_name))
     logger.info(index.describe_index_stats())
@@ -103,10 +100,7 @@ def _init_vector_store_supabase(config_loader):
         supabase_key=os.environ.get("SUPABASE_API_KEY"),
         options=ClientOptions(postgrest_client_timeout=60),
     )
-    embeddings = HuggingFaceEmbeddings(
-        model_name=config_loader["embeddings_model_name"],
-        model_kwargs={"device": "cpu"},
-    )
+    embeddings = _load_model_embedding(config_loader)
     vector_store = StandardSupabaseVectorStore(
         client=supabase_client,
         embedding=embeddings,
@@ -125,22 +119,16 @@ def _init_vector_stores_qdrant(config_loader):
         api_key=os.environ["QDRANT_API_KEY"],
         prefer_grpc=True,
     )
-    embeddings = HuggingFaceEmbeddings(
-        model_name=config_loader["embeddings_model_name"],
-        model_kwargs={"device": "cpu"},
-    )
+    embeddings = _load_model_embedding(config_loader)
     vector_stores = {}
     for collection_name in config_loader["collections"]:
-        if not _exists_collection(qdrant_client, collection_name):
-            logger.info("Creating collection for vector store")
-            qdrant_client.recreate_collection(
-                collection_name=collection_name,
-                vectors_config=VectorParams(
-                    size=config_loader["embeddings_model_size"], distance=config_loader["distance_type"]
-                ),
-                on_disk_payload=True,
+        try:
+            qdrant_client.get_collection(collection_name=collection_name)
+        except:
+            logger.warning(
+                "Collection [%s] not exists. Please, create manually the collection: "
+                "PUT /collections/{collection_name}{...}", collection_name
             )
-            logger.info("Created collection [%s] for vector store", collection_name)
         vector_stores[collection_name] = Qdrant(qdrant_client, collection_name, embeddings)
         logger.info("Initialized vector store for collection [%s]", collection_name)
     return vector_stores
@@ -156,14 +144,24 @@ def _init_openai_client():
     return client
 
 
-def _exists_collection(qdrant_client, collection_name):
-    logger = lg.getLogger(_exists_collection.__name__)
+def _load_model_embedding(config_loader):
+    logger = lg.getLogger(_load_model_embedding.__name__)
+    logger.info("Loading embedding model")
     try:
-        qdrant_client.get_collection(collection_name=collection_name)
-        return True
-    except:
-        logger.warn("Collection [%s] doesn't exist", collection_name)
-        return False
+        embeddings = HuggingFaceEmbeddings(
+            model_name=config_loader["embeddings_model_name"],
+            model_kwargs={"device": "cuda"},
+        )
+        logger.info("Loaded model embedding using GPU")
+    except Exception as e:
+        logger.warning("GPU is not working. More info: %s", e)
+        embeddings = HuggingFaceEmbeddings(
+            model_name=config_loader["embeddings_model_name"],
+            model_kwargs={"device": "cpu"},
+        )
+        logger.info("Loaded model embedding using CPU")
+    return embeddings
+
 
 
 def _init_retrieval_qa_llm(vector_store, config_loader):

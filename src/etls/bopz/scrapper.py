@@ -122,7 +122,7 @@ class BOPZScrapper(BaseScrapper):
         """
         logger = lg.getLogger(self.download_document.__name__)
         logger.info("Scrapping document: %s", url)
-        response = requests.get(url)
+        response = requests.get(url, timeout=30)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, "lxml")
         with tempfile.NamedTemporaryFile("w", delete=False) as fn:

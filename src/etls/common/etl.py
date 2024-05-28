@@ -10,6 +10,7 @@ from retry import retry
 from src.etls.common.metadata import MetadataDocument
 from src.etls.common.utils import TextLoader
 from src.initialize import initialize_logging
+from src.utils import timeit
 
 initialize_logging()
 
@@ -24,6 +25,7 @@ class ETL:
         self._load_database(chunks)
         # self._log_database_stats()
 
+    @timeit
     def _split_documents(self, docs: tp.List[MetadataDocument]) -> tp.List[Document]:
         """Split documents by chunks
 
@@ -41,12 +43,12 @@ class ETL:
                 chunk_overlap=self._config_loader["chunk_overlap"],
             )
             docs_chunks += text_splitter.split_documents(documents)
-
             logger.info("Removing file %s", doc.filepath)
             os.remove(doc.filepath)
         logger.info("Splitted %s documents in %s chunks", len(docs), len(docs_chunks))
         return docs_chunks
 
+    @timeit
     @retry(tries=3, delay=2)
     def _load_database(self, docs_chunks: tp.List[Document]) -> None:
         logger = lg.getLogger(self._load_database.__name__)

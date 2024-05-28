@@ -19,6 +19,7 @@ from qdrant_client import QdrantClient
 from qdrant_client.models import VectorParams
 from supabase.client import Client, create_client
 from tavily import TavilyClient
+import GPUtil
 
 from src.utils import StandardSupabaseVectorStore
 
@@ -147,14 +148,13 @@ def _init_openai_client():
 def _load_model_embedding(config_loader):
     logger = lg.getLogger(_load_model_embedding.__name__)
     logger.info("Loading embedding model")
-    try:
+    if _exists_gpu():
         embeddings = HuggingFaceEmbeddings(
             model_name=config_loader["embeddings_model_name"],
             model_kwargs={"device": "cuda"},
         )
         logger.info("Loaded model embedding using GPU")
-    except Exception as e:
-        logger.warning("GPU is not working. More info: %s", e)
+    else:
         embeddings = HuggingFaceEmbeddings(
             model_name=config_loader["embeddings_model_name"],
             model_kwargs={"device": "cpu"},
@@ -162,6 +162,10 @@ def _load_model_embedding(config_loader):
         logger.info("Loaded model embedding using CPU")
     return embeddings
 
+
+def _exists_gpu():
+    gpus = GPUtil.getGPUs()
+    return len(gpus) > 0
 
 
 def _init_retrieval_qa_llm(vector_store, config_loader):

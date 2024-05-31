@@ -19,6 +19,7 @@ from qdrant_client import QdrantClient
 from qdrant_client.models import VectorParams
 from supabase.client import Client, create_client
 from tavily import TavilyClient
+from langsmith.wrappers import wrap_openai
 
 from src.utils import StandardSupabaseVectorStore
 
@@ -152,6 +153,7 @@ def _init_openai_client():
     client = AsyncOpenAI(
         api_key=os.environ.get("OPENAI_API_KEY"),
     )
+    client = wrap_openai(client)
     logger.info("Initialized OpenAI client")
     return client
 

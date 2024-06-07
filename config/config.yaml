@@ -4,9 +4,6 @@ chunk_overlap: 100
 
 admin_email: bukosabino@gmail.com
 
-# embeddings_model_name: dariolopez/roberta-base-bne-finetuned-msmarco-qa-es-mnrl-mn
-# embeddings_model_size: 768
-
 embeddings_model_name: intfloat/multilingual-e5-large
 embeddings_model_size: 1024
 
@@ -29,13 +26,18 @@ prompt_system_context: |
 # Qdrant
 collections:
   - justicio
-  - boe-multilingual-e5-large
   - boe
+  - boe-multilingual-e5-large
   - bocm
+  - bocm-multilingual-e5-large
   - bopz
+  - bopz-multilingual-e5-large
   - bopv
+  - bopv-multilingual-e5-large
   - boja
+  - boja-multilingual-e5-large
   - boa
+  - boa-multilingual-e5-large
 
 # Openai
 llm_model_name: 'gpt-3.5-turbo-0125'  # 'gpt-3.5-turbo-1106', 'gpt-4-1106-preview'

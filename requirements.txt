@@ -15,6 +15,7 @@ schedule==1.2.1
 
 langchain==0.1.20
 # langchainplus-sdk==0.0.20
+langchain-groq==0.1.4
 langsmith==0.1.57
 qdrant-client==1.8.0
 supabase==1.0.2

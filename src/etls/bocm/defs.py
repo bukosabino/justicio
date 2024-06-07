@@ -1,1 +1,1 @@
-COLLECTION_NAME = "bocm"
+COLLECTION_NAME = "bocm-multilingual-e5-large"

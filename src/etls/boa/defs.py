@@ -1,1 +1,1 @@
-COLLECTION_NAME = "boa"
+COLLECTION_NAME = "boa-multilingual-e5-large"

@@ -1,0 +1,1 @@
+COLLECTION_NAME = "dgt"

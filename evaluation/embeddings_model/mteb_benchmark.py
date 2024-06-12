@@ -1,4 +1,4 @@
-from mteb import MTEB
+import mteb
 from sentence_transformers import SentenceTransformer
 
 
@@ -16,10 +16,17 @@ from sentence_transformers import SentenceTransformer
 # model_name = "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"
 # model_name = "intfloat/multilingual-e5-small"
 # model_name = "intfloat/multilingual-e5-base"
-# model_name = "intfloat/multilingual-e5-large"
-model_name = "intfloat/multilingual-e5-large-instruct"
+model_name = "intfloat/multilingual-e5-large"
+# model_name = "intfloat/multilingual-e5-large-instruct"
 
+try:
+    model = SentenceTransformer(model_name, device='cuda')
+    print("Loaded model embedding using GPU")
+except:
+    model = SentenceTransformer(model_name, device='cpu')
+    print("Loaded model embedding using CPU")
 
-model = SentenceTransformer(model_name)
-evaluation = MTEB(task_langs=["es"])
+tasks = mteb.get_tasks(languages=["spa"])  # Spanish
+print(tasks)
+evaluation = mteb.MTEB(tasks=tasks)
 results = evaluation.run(model, output_folder=f"results/{model_name}")

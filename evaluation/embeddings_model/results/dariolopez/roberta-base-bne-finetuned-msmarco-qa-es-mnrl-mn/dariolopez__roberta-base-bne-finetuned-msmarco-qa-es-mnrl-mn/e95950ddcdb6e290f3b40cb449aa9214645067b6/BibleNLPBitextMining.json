@@ -1,0 +1,35 @@
+{
+  "dataset_revision": "264a18480c529d9e922483839b4b9758e690b762",
+  "evaluation_time": 1.3429553508758545,
+  "kg_co2_emissions": null,
+  "mteb_version": "1.12.39",
+  "scores": {
+    "train": [
+      {
+        "accuracy": 0.1875,
+        "f1": 0.1409097413003663,
+        "hf_subset": "eng_Latn-spa_Latn",
+        "languages": [
+          "eng-Latn",
+          "spa-Latn"
+        ],
+        "main_score": 0.1409097413003663,
+        "precision": 0.1267657039141414,
+        "recall": 0.1875
+      },
+      {
+        "accuracy": 0.125,
+        "f1": 0.08871755733543418,
+        "hf_subset": "spa_Latn-eng_Latn",
+        "languages": [
+          "spa-Latn",
+          "eng-Latn"
+        ],
+        "main_score": 0.08871755733543418,
+        "precision": 0.07890790119263284,
+        "recall": 0.125
+      }
+    ]
+  },
+  "task_name": "BibleNLPBitextMining"
+}

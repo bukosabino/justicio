@@ -1,0 +1,76 @@
+{
+  "dataset_revision": "de9d86b3b84231dc21f76c7b7af1f28e2f57f6e3",
+  "evaluation_time": 18.019099712371826,
+  "kg_co2_emissions": null,
+  "mteb_version": "1.12.39",
+  "scores": {
+    "test": [
+      {
+        "cosine_pearson": 0.7536285647220418,
+        "cosine_spearman": 0.7865922376187726,
+        "euclidean_pearson": 0.7671307474757204,
+        "euclidean_spearman": 0.7865922376187726,
+        "hf_subset": "es-en",
+        "languages": [
+          "spa-Latn",
+          "eng-Latn"
+        ],
+        "main_score": 0.7865922376187726,
+        "manhattan_pearson": 0.7671535829479618,
+        "manhattan_spearman": 0.7847941594355752,
+        "pearson": [
+          0.7536285034988063,
+          8.8421762586021e-70
+        ],
+        "spearman": [
+          0.7865922376187726,
+          6.756880288557219e-80
+        ]
+      },
+      {
+        "cosine_pearson": 0.6194193480204303,
+        "cosine_spearman": 0.6823157523696245,
+        "euclidean_pearson": 0.6467777361413329,
+        "euclidean_spearman": 0.6823157523696245,
+        "hf_subset": "es",
+        "languages": [
+          "spa-Latn"
+        ],
+        "main_score": 0.6823157523696245,
+        "manhattan_pearson": 0.6482067157339559,
+        "manhattan_spearman": 0.6832827783355593,
+        "pearson": [
+          0.619419425291192,
+          4.146083182990284e-23
+        ],
+        "spearman": [
+          0.6823157523696245,
+          1.965380323970148e-29
+        ]
+      },
+      {
+        "cosine_pearson": 0.6871320319309592,
+        "cosine_spearman": 0.7482729295225335,
+        "euclidean_pearson": 0.7045590878447581,
+        "euclidean_spearman": 0.7482729295225335,
+        "hf_subset": "es-it",
+        "languages": [
+          "spa-Latn",
+          "ita-Latn"
+        ],
+        "main_score": 0.7482729295225335,
+        "manhattan_pearson": 0.7042416024680677,
+        "manhattan_spearman": 0.7485161011360759,
+        "pearson": [
+          0.6871319002811572,
+          8.435008393649687e-32
+        ],
+        "spearman": [
+          0.7482729295225335,
+          2.2952345874336864e-40
+        ]
+      }
+    ]
+  },
+  "task_name": "STS22"
+}

@@ -1,0 +1,127 @@
+{
+  "dataset_revision": "8a04d940a42cd40658986fdd8e3da561533a3646",
+  "evaluation_time": 7.871694087982178,
+  "kg_co2_emissions": null,
+  "mteb_version": "1.12.39",
+  "scores": {
+    "test": [
+      {
+        "cosine": {
+          "accuracy": 0.5865,
+          "accuracy_threshold": 0.9961481690406799,
+          "ap": 0.5636790445966594,
+          "f1": 0.6246556473829201,
+          "f1_threshold": 0.8752727508544922,
+          "precision": 0.4541812719078618,
+          "recall": 1.0
+        },
+        "dot": {
+          "accuracy": 0.5865,
+          "accuracy_threshold": 0.9961481094360352,
+          "ap": 0.563678153658613,
+          "f1": 0.6246556473829201,
+          "f1_threshold": 0.8752727508544922,
+          "precision": 0.4541812719078618,
+          "recall": 1.0
+        },
+        "euclidean": {
+          "accuracy": 0.5865,
+          "accuracy_threshold": 0.08777029812335968,
+          "ap": 0.563678153658613,
+          "f1": 0.6246556473829201,
+          "f1_threshold": 0.49925684928894043,
+          "precision": 0.4541812719078618,
+          "recall": 1.0
+        },
+        "hf_subset": "es",
+        "languages": [
+          "spa-Latn"
+        ],
+        "main_score": 0.5639685167829116,
+        "manhattan": {
+          "accuracy": 0.5865,
+          "accuracy_threshold": 2.234175205230713,
+          "ap": 0.5639685167829116,
+          "f1": 0.6246556473829201,
+          "f1_threshold": 12.686552047729492,
+          "precision": 0.4541812719078618,
+          "recall": 1.0
+        },
+        "max": {
+          "accuracy": 0.5865,
+          "ap": 0.5639685167829116,
+          "f1": 0.6246556473829201
+        },
+        "similarity": {
+          "accuracy": 0.5865,
+          "accuracy_threshold": 0.9961482882499695,
+          "ap": 0.5636835769082358,
+          "f1": 0.6246556473829201,
+          "f1_threshold": 0.8752727508544922,
+          "precision": 0.4541812719078618,
+          "recall": 1.0
+        }
+      }
+    ],
+    "validation": [
+      {
+        "cosine": {
+          "accuracy": 0.619,
+          "accuracy_threshold": 0.9945603013038635,
+          "ap": 0.5441059800807568,
+          "f1": 0.6033559443056051,
+          "f1_threshold": 0.9101866483688354,
+          "precision": 0.43244626407369496,
+          "recall": 0.9976387249114522
+        },
+        "dot": {
+          "accuracy": 0.619,
+          "accuracy_threshold": 0.9945603013038635,
+          "ap": 0.5437686550681073,
+          "f1": 0.6033559443056051,
+          "f1_threshold": 0.9101867079734802,
+          "precision": 0.43244626407369496,
+          "recall": 0.9976387249114522
+        },
+        "euclidean": {
+          "accuracy": 0.619,
+          "accuracy_threshold": 0.10430458933115005,
+          "ap": 0.544105980080757,
+          "f1": 0.6033559443056051,
+          "f1_threshold": 0.4238162934780121,
+          "precision": 0.43244626407369496,
+          "recall": 0.9976387249114522
+        },
+        "hf_subset": "es",
+        "languages": [
+          "spa-Latn"
+        ],
+        "main_score": 0.5445599041471212,
+        "manhattan": {
+          "accuracy": 0.62,
+          "accuracy_threshold": 2.635448932647705,
+          "ap": 0.5443078672097414,
+          "f1": 0.6033559443056051,
+          "f1_threshold": 10.812749862670898,
+          "precision": 0.43244626407369496,
+          "recall": 0.9976387249114522
+        },
+        "max": {
+          "accuracy": 0.62,
+          "ap": 0.5445599041471212,
+          "f1": 0.6033559443056051
+        },
+        "similarity": {
+          "accuracy": 0.619,
+          "accuracy_threshold": 0.9945603609085083,
+          "ap": 0.5445599041471212,
+          "f1": 0.6033559443056051,
+          "f1_threshold": 0.910186767578125,
+          "precision": 0.43244626407369496,
+          "recall": 0.9976387249114522
+        }
+      }
+    ]
+  },
+  "task_name": "PawsX"
+}

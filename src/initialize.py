@@ -19,6 +19,7 @@ from qdrant_client import QdrantClient
 from qdrant_client.models import VectorParams
 from supabase.client import Client, create_client
 from tavily import TavilyClient
+from langsmith.wrappers import wrap_openai
 
 from src.utils import StandardSupabaseVectorStore
 
@@ -152,14 +153,15 @@ def _init_openai_client():
     client = AsyncOpenAI(
         api_key=os.environ.get("OPENAI_API_KEY"),
     )
+    client = wrap_openai(client)
     logger.info("Initialized OpenAI client")
     return client
 
 
-def _exists_collection(client, collection_name):
+def _exists_collection(qdrant_client, collection_name):
     logger = lg.getLogger(_exists_collection.__name__)
     try:
-        client.get_collection(collection_name=collection_name)
+        qdrant_client.get_collection(collection_name=collection_name)
         return True
     except:
         logger.warn("Collection [%s] doesn't exist", collection_name)

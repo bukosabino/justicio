@@ -1,0 +1,25 @@
+{
+  "dataset_revision": "d80d48c1eb48d3562165c59d59d0034df9fff0bf",
+  "mteb_dataset_name": "MTOPDomainClassification",
+  "mteb_version": "1.1.1",
+  "test": {
+    "es": {
+      "accuracy": 0.8585723815877252,
+      "accuracy_stderr": 0.009637393496881178,
+      "f1": 0.8547711636074229,
+      "f1_stderr": 0.009801142326641072,
+      "main_score": 0.8585723815877252
+    },
+    "evaluation_time": 26.16
+  },
+  "validation": {
+    "es": {
+      "accuracy": 0.8573018991486576,
+      "accuracy_stderr": 0.013988831481303218,
+      "f1": 0.8568403693895226,
+      "f1_stderr": 0.014658470836623546,
+      "main_score": 0.8573018991486576
+    },
+    "evaluation_time": 17.41
+  }
+}

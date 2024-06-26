@@ -1,0 +1,1 @@
+{"name": "BAAI/bge-m3", "revision": "babcf60cae0a1f438d7ade582983d4ba462303c2", "release_date": null, "languages": [], "n_parameters": null, "memory_usage": null, "max_tokens": null, "embed_dim": null, "license": null, "open_source": null, "similarity_fn_name": null, "framework": ["Sentence Transformers"], "loader": null}

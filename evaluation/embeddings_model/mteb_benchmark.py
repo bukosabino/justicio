@@ -7,7 +7,7 @@ from sentence_transformers import SentenceTransformer
 
 # TODO: write results on model cards huggingface
 # Define the sentence-transformers model name
-model_name = "dariolopez/roberta-base-bne-finetuned-msmarco-qa-es-mnrl-mn"
+# model_name = "dariolopez/roberta-base-bne-finetuned-msmarco-qa-es-mnrl-mn"
 # model_name = "dariolopez/roberta-base-bne-finetuned-msmarco-qa-es"
 # model_name = "PlanTL-GOB-ES/roberta-base-bne"
 # model_name = "PlanTL-GOB-ES/RoBERTalex"
@@ -18,6 +18,7 @@ model_name = "dariolopez/roberta-base-bne-finetuned-msmarco-qa-es-mnrl-mn"
 # model_name = "intfloat/multilingual-e5-base"
 # model_name = "intfloat/multilingual-e5-large"
 # model_name = "intfloat/multilingual-e5-large-instruct"
+model_name = "BAAI/bge-m3"
 
 try:
     model = SentenceTransformer(model_name, device='cuda')
@@ -40,20 +41,20 @@ TASK_LIST_PAIR_CLASSIFICATION = [
 ]
 
 TASK_LIST_MULTI_LABEL_CLASSIFICATION = [
-    "MultiEURLEXMultilabelClassification"
+    ## "MultiEURLEXMultilabelClassification"
 ]
 
 TASK_LIST_RETRIEVAL = [
     # "BelebeleRetrieval",
     "MintakaRetrieval",
-    "MIRACLRetrieval",
+    ## "MIRACLRetrieval",
     # "MLQARetrieval",
     # "MultiLongDocRetrieval",
     "PublicHealthQA",
-    "XMarket",
+    # "XMarket",
     "XPQARetrieval",
     "XQuADRetrieval",
-    "SpanishPassageRetrievalS2P",
+    ## "SpanishPassageRetrievalS2P",
     "SpanishPassageRetrievalS2S"
 ]
 
@@ -69,14 +70,14 @@ TASK_LIST_CLASSIFICATION = [
     # "MultilingualSentimentClassification",
     "SIB200Classification",
     "TweetSentimentClassification",
-    "SpanishNewsClassification",
+    ## "SpanishNewsClassification",
     "SpanishSentimentClassification"
 ]
 
 TASK_LIST_CLUSTERING = [
     # "MLSUMClusteringP2P.v2",
-    "SpanishNewsClusteringP2P",
-    "MLSUMClusteringS2S.v2",
+    ## "SpanishNewsClusteringP2P",
+    ## "MLSUMClusteringS2S.v2",
     "SIB200ClusteringS2S"
 ]
 
@@ -86,7 +87,7 @@ TASK_LIST_RERANKING = [
 
 TASK_LIST_STS = [
     "STS17",
-    "STS22",
+    ## "STS22",
     "STSBenchmarkMultilingualSTS",
     "STSES"
 ]

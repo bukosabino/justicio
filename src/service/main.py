@@ -96,7 +96,7 @@ async def qa_feedback(span_id: str, trace_id: str, user_score: int):
 
 
 @APP.get("/qa")
-@with_langtrace_root_span("LLM")
+@with_langtrace_root_span("RAG Justicio")
 @timeit
 async def qa(
     request: Request,

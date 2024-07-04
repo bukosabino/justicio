@@ -15,7 +15,7 @@ schedule==1.2.1
 
 langchain==0.2.1
 # langchainplus-sdk==0.0.20
-langsmith==0.1.65
+# langsmith==0.1.65
 langchain-openai==0.1.8
 langchain-core==0.2.3
 langchain-community==0.2.1

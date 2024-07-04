@@ -6,6 +6,11 @@ from functools import wraps
 from langchain.schema import Document
 from langchain.vectorstores import SupabaseVectorStore
 from pydantic import BaseModel
+from fastapi import Request
+from opentelemetry import baggage, context
+from langtrace_python_sdk.constants.instrumentation.common import (
+    LANGTRACE_ADDITIONAL_SPAN_ATTRIBUTES_KEY,
+)
 
 
 class StandardSupabaseVectorStore(SupabaseVectorStore):
@@ -35,3 +40,22 @@ def timeit(func):
         return result
 
     return wrapper
+
+
+async def inject_additional_attributes(fn, attributes=None):
+    if attributes:
+        new_ctx = baggage.set_baggage(
+            LANGTRACE_ADDITIONAL_SPAN_ATTRIBUTES_KEY, attributes
+        )
+        context.attach(new_ctx)
+
+    return await fn()
+
+
+def get_ip_client(request: Request):
+    x_forwarded_for = request.headers.get('x-forwarded-for')
+    if x_forwarded_for:
+        ip_client = x_forwarded_for.split(',')[0]
+    else:
+        ip_client = request.client.host
+    return ip_client

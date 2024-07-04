@@ -19,10 +19,9 @@ langsmith==0.1.65
 langchain-openai==0.1.8
 langchain-core==0.2.3
 langchain-community==0.2.1
+langtrace_python_sdk==2.1.26
 
-qdrant-client==1.8.0
-supabase==1.0.2
-pinecone-client==2.2.2
+qdrant-client==1.9.2
 sentence_transformers==2.2.2
 openai==1.30.5
 tavily-python==0.3.3

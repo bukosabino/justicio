@@ -211,3 +211,9 @@ async def sleep():
 async def asleep():
     await asyncio.sleep(5)
     return {"status": "OK"}
+
+
+@APP.get("/get-ip")
+async def get_ip(request: Request):
+    client_host = request.client.host
+    return {"ip": client_host}

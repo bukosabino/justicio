@@ -9,7 +9,7 @@ import httpx
 from fastapi import FastAPI, Request
 
 from src.initialize import initialize_app, initialize_logging
-from src.utils import get_ip_client, inject_additional_attributes, timeit
+from src.utils import inject_additional_attributes, timeit
 from langtrace_python_sdk import SendUserFeedback, langtrace
 from langtrace_python_sdk.utils.with_root_span import with_langtrace_root_span
 
@@ -131,7 +131,7 @@ async def qa(
     # logger.info(messages)
     response, span_id, trace_id = await inject_additional_attributes(
         lambda: call_llm_api(model_name=model_name, messages=messages),
-        {"db.collection.name": collection_name, "service.ip": get_ip_client(request)}
+        {"db.collection.name": collection_name, "service.ip": request.client.host}
     )
     answer = response.choices[0].message.content
     logger.info(answer)
@@ -211,9 +211,3 @@ async def sleep():
 async def asleep():
     await asyncio.sleep(5)
     return {"status": "OK"}
-
-
-@APP.get("/get-ip")
-async def get_ip(request: Request):
-    client_host = request.client.host
-    return {"ip": client_host}

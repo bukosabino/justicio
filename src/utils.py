@@ -50,12 +50,3 @@ async def inject_additional_attributes(fn, attributes=None):
         context.attach(new_ctx)
 
     return await fn()
-
-
-def get_ip_client(request: Request):
-    x_forwarded_for = request.headers.get('x-forwarded-for')
-    if x_forwarded_for:
-        ip_client = x_forwarded_for.split(',')[0]
-    else:
-        ip_client = request.client.host
-    return ip_client

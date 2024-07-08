@@ -13,13 +13,6 @@ from langtrace_python_sdk.constants.instrumentation.common import (
 )
 
 
-class StandardSupabaseVectorStore(SupabaseVectorStore):
-    def similarity_search_with_score(
-        self, query: str, k: int = 4, **kwargs: tp.Any
-    ) -> tp.List[tp.Tuple[Document, float]]:
-        return self.similarity_search_with_relevance_scores(query, k, **kwargs)
-
-
 class QAResponsePayloadModel(BaseModel):
     scoring_id: str
     context: tp.List[tp.Tuple[Document, float]]

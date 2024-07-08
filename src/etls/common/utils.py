@@ -1,11 +1,12 @@
 import typing as tp
 from requests.exceptions import Timeout
 import random
-import requests
 from bs4 import BeautifulSoup
 
 from langchain.docstore.document import Document
 from langchain.document_loaders.base import BaseLoader
+
+from src.etls.utils import create_retry_session
 
 
 class TextLoader(BaseLoader):
@@ -101,7 +102,8 @@ class HTTPRequester:
         """
         headers = HTTPRequester.get_headers()
         try:
-            response = requests.get(url, headers=headers, timeout=timeout)
+            session = create_retry_session(retries=5)
+            response = session.get(url, headers=headers, timeout=timeout)
             response.raise_for_status()
             return BeautifulSoup(response.content, markup)
         except Timeout as e:

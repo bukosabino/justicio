@@ -12,6 +12,7 @@ from src.etls.bopz.utils import DATA_POST
 from src.etls.bopz.metadata import BOPZMetadataDocument
 from src.etls.common.scrapper import BaseScrapper
 from src.initialize import initialize_logging
+from src.etls.utils import create_retry_session
 
 initialize_logging()
 
@@ -122,7 +123,8 @@ class BOPZScrapper(BaseScrapper):
         """
         logger = lg.getLogger(self.download_document.__name__)
         logger.info("Scrapping document: %s", url)
-        response = requests.get(url)
+        session = create_retry_session(retries=5)
+        response = session.get(url)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, "lxml")
         with tempfile.NamedTemporaryFile("w", delete=False) as fn:

@@ -125,7 +125,7 @@ class BOAScrapper(BaseScrapper):
                      # 'SECC-C':'BOA%2Bo%2BDisposiciones%2Bo%2BPersonal%2Bo%2BAcuerdos%2Bo%2BJusticia%2Bo%2BAnuncios' 
                      }
             session = create_retry_session(retries=5)
-            response = session.get(self.base_url, params=params)
+            response = session.get(self.base_url, params=params, timeout=10)
             raw_result = response.text
             if '<span class="titulo">No se han recuperado documentos</span>' in raw_result:
                 logger.info(f"No hay contenido disponible para el día {day}")

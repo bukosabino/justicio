@@ -135,7 +135,7 @@ class BOPVScrapper(BaseScrapper):
         logger.info("Scrapping document: %s", url)
         try:
             session = create_retry_session(retries=5)
-            response = session.get(url, headers=self.headers)
+            response = session.get(url, headers=self.headers, timeout=10)
             if response.status_code != 200:
                 response.raise_for_status() 
             soup = BeautifulSoup(response.content, "html.parser")

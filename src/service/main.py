@@ -4,9 +4,10 @@ import time
 import uuid
 import os
 import typing as tp
+import ipaddress
 
 import httpx
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 
 from src.initialize import initialize_app, initialize_logging
 from src.utils import inject_additional_attributes, timeit
@@ -99,10 +100,11 @@ async def qa_feedback(span_id: str, trace_id: str, user_score: int):
 @with_langtrace_root_span("RAG Justicio")
 @timeit
 async def qa(
-    request: Request,
     input_query: str = DEFAULT_INPUT_QUERY,
     collection_name: str = DEFAULT_COLLECTION_NAME,
     model_name: str = INIT_OBJECTS.config_loader["llm_model_name"],
+    input_original_query: str | None = None,
+    ip_request_client: ipaddress.IPv4Address | None = None,
 ):
     logger = lg.getLogger(qa.__name__)
     logger.info(input_query)
@@ -129,9 +131,13 @@ async def qa(
         {"role": "user", "content": input_query},
     ]
     # logger.info(messages)
+    additional_attributes = {
+        "db.collection.name": collection_name,
+        "service.ip": ip_request_client,
+        "llm.original_query": input_original_query
+    }
     response, span_id, trace_id = await inject_additional_attributes(
-        lambda: call_llm_api(model_name=model_name, messages=messages),
-        {"db.collection.name": collection_name, "service.ip": request.client.host}
+        lambda: call_llm_api(model_name=model_name, messages=messages), additional_attributes
     )
     answer = response.choices[0].message.content
     logger.info(answer)

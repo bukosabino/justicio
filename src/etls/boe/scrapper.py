@@ -155,8 +155,33 @@ class BOEScrapper(BaseScrapper):
         response.raise_for_status()
         soup = BeautifulSoup(response.text, "lxml")
         with tempfile.NamedTemporaryFile("w", delete=False) as fn:
-            text = soup.select_one("documento > texto").get_text()
+            if url_eli := soup.metadatos.url_eli:
+                url = url_eli.get_text()
+                text = self.download_eli_document(url)
+            else:
+                text = soup.select_one("documento > texto").get_text()
             fn.write(text)
         metadata_doc = BOEMetadataDocument(filepath=fn.name, **_extract_metadata(soup))
         logger.info("Scrapped document successfully %s", url)
         return metadata_doc
+
+    def download_eli_document(self, url: str) -> str:
+        """Get text from a BOE eli url document.
+
+        :param url: document url link. Examples:
+            * https://www.boe.es/eli/es/c/1978/12/27/(1)/con
+            *
+        :return: document with metadata and filepath with text content
+        """
+        logger = lg.getLogger(self.download_eli_document.__name__)
+        logger.info("Scrapping consolidated text (eli) from document: %s", url)
+        session = create_retry_session(retries=5)
+        response = session.get(url, timeout=10)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.text, "html.parser")
+        div = soup.find("div", id="textoxslt")
+        if marcadores := div.find('div', class_='marcadores'):
+            marcadores.decompose()
+        text_consolidated = div.get_text()
+        logger.info("Scrapped consolidated text (eli) successfully from document: %s", url)
+        return text_consolidated

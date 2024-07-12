@@ -75,7 +75,7 @@ if __name__ == "__main__":
 
     docs = []
     for boe_id in documents_filtered:
-        logger.info("Loading BOE Id: %s", boe_id)
+        logger.info("Downloading BOE Id: %s", boe_id)
         url = f"https://www.boe.es/diario_boe/xml.php?id={boe_id}"
         try:
             meta_document = boe_scrapper.download_document(url)

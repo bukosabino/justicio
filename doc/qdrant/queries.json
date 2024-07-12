@@ -91,5 +91,21 @@ POST collections/justicio/points/delete
   }
 }
 
+// No funciona porque tenemos las fechas como strings en lugar de como números.
+POST /collections/boe-bge-m3/points/count
+{
+    "filter": {
+        "should": [
+            {
+                "key": "metadata.anio",
+                "range": {
+                    "gte": 2000
+                }
+            }
+        ]
+    }
+}
+
+
 // https://qdrant.tech/documentation/concepts/filtering/
 // https://qdrant.tech/documentation/concepts/points/

@@ -7,13 +7,11 @@ from functools import wraps
 from langchain.schema import Document
 from langchain.vectorstores import SupabaseVectorStore
 from pydantic import BaseModel
-
-
-class StandardSupabaseVectorStore(SupabaseVectorStore):
-    def similarity_search_with_score(
-        self, query: str, k: int = 4, **kwargs: tp.Any
-    ) -> tp.List[tp.Tuple[Document, float]]:
-        return self.similarity_search_with_relevance_scores(query, k, **kwargs)
+from fastapi import Request
+from opentelemetry import baggage, context
+from langtrace_python_sdk.constants.instrumentation.common import (
+    LANGTRACE_ADDITIONAL_SPAN_ATTRIBUTES_KEY,
+)
 
 
 class QAResponsePayloadModel(BaseModel):
@@ -61,3 +59,14 @@ def timeit(func):
         return async_wrapper
     else:
         return sync_wrapper
+    return wrapper
+
+
+async def inject_additional_attributes(fn, attributes=None):
+    if attributes:
+        new_ctx = baggage.set_baggage(
+            LANGTRACE_ADDITIONAL_SPAN_ATTRIBUTES_KEY, attributes
+        )
+        context.attach(new_ctx)
+
+    return await fn()

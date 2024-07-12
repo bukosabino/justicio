@@ -12,6 +12,7 @@ from src.etls.bocm.metadata import BOCMMetadataDocument
 from src.etls.bocm.utils import *
 from src.etls.common.scrapper import BaseScrapper
 from src.initialize import initialize_logging
+from src.etls.utils import create_retry_session
 
 
 initialize_logging()
@@ -165,7 +166,8 @@ class BOCMScrapper(BaseScrapper):
         """
         logger = lg.getLogger(self.download_document.__name__)
         logger.info("Scrapping document: %s", url)
-        response = requests.get(url, timeout=30)
+        session = create_retry_session(retries=5)
+        response = session.get(url, timeout=10)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, features="lxml")
         with tempfile.NamedTemporaryFile("w", delete=False) as fn:

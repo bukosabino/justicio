@@ -13,6 +13,7 @@ from src.etls.common.metadata import MetadataDocument
 from src.etls.common.scrapper import BaseScrapper
 from src.etls.common.utils import ScrapperError
 from src.initialize import initialize_logging
+from src.etls.utils import create_retry_session
 
 
 initialize_logging()
@@ -123,7 +124,8 @@ class BOAScrapper(BaseScrapper):
                      # versión completa (todas las secciones, incluyendo personal, etc):
                      # 'SECC-C':'BOA%2Bo%2BDisposiciones%2Bo%2BPersonal%2Bo%2BAcuerdos%2Bo%2BJusticia%2Bo%2BAnuncios' 
                      }
-            response = requests.get(self.base_url, params=params)
+            session = create_retry_session(retries=5)
+            response = session.get(self.base_url, params=params, timeout=10)
             raw_result = response.text
             if '<span class="titulo">No se han recuperado documentos</span>' in raw_result:
                 logger.info(f"No hay contenido disponible para el día {day}")

@@ -2,7 +2,6 @@ import collections
 import logging as lg
 import os
 
-import pinecone
 import yaml
 from langchain.chains import RetrievalQA
 from langchain.chat_models import ChatOpenAI
@@ -12,16 +11,12 @@ from langchain.prompts import (
     HumanMessagePromptTemplate,
     SystemMessagePromptTemplate,
 )
-from langchain.vectorstores.pinecone import Pinecone
 from langchain.vectorstores.qdrant import Qdrant
 from openai import AsyncOpenAI
 from qdrant_client import QdrantClient
 from qdrant_client.models import VectorParams
-from supabase.client import Client, create_client
 from tavily import TavilyClient
 import GPUtil
-
-from src.utils import StandardSupabaseVectorStore
 
 
 def initialize_logging():
@@ -63,52 +58,10 @@ def _init_config():
 def _init_vector_store(config_loader):
     logger = lg.getLogger(_init_vector_store.__name__)
     logger.info("Initializing vector store")
-    if config_loader["vector_store"] == "pinecone":
-        vector_store = _init_vector_store_pinecone(config_loader)
-    elif config_loader["vector_store"] == "supabase":
-        vector_store = _init_vector_store_supabase(config_loader)
-    elif config_loader["vector_store"] == "qdrant":
+    if config_loader["vector_store"] == "qdrant":
         vector_store = _init_vector_stores_qdrant(config_loader)
     else:
         raise ValueError("Vector Database not configured")
-    return vector_store
-
-
-def _init_vector_store_pinecone(config_loader):
-    logger = lg.getLogger(_init_vector_store_pinecone.__name__)
-    logger.info("Initializing vector store")
-    pinecone.init(
-        api_key=os.environ["PINECONE_API_KEY"],
-        environment=os.environ["PINECONE_ENV"],
-    )
-    index_name = config_loader["vector_store_index_name"]
-    index = pinecone.Index(index_name)
-    embeddings = _load_model_embedding(config_loader)
-    vector_store = Pinecone(index, embeddings.embed_query, "text")
-    logger.info(pinecone.describe_index(index_name))
-    logger.info(index.describe_index_stats())
-    logger.info("Initialized vector store")
-    return vector_store
-
-
-def _init_vector_store_supabase(config_loader):
-    from supabase.lib.client_options import ClientOptions
-
-    logger = lg.getLogger(_init_vector_store_supabase.__name__)
-    logger.info("Initializing vector store")
-    supabase_client: Client = create_client(
-        supabase_url=os.environ.get("SUPABASE_API_URL"),
-        supabase_key=os.environ.get("SUPABASE_API_KEY"),
-        options=ClientOptions(postgrest_client_timeout=60),
-    )
-    embeddings = _load_model_embedding(config_loader)
-    vector_store = StandardSupabaseVectorStore(
-        client=supabase_client,
-        embedding=embeddings,
-        table_name=config_loader["table_name"],
-        query_name=config_loader["query_name"],
-    )
-    logger.info("Initialized vector store")
     return vector_store
 
 

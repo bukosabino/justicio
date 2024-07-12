@@ -13,6 +13,7 @@ from src.etls.bopv.metadata import BOPVMetadataDocument
 from src.etls.common.scrapper import BaseScrapper
 from src.etls.common.utils import ScrapperError
 from src.initialize import initialize_logging
+from src.etls.utils import create_retry_session
 
 
 initialize_logging()
@@ -133,7 +134,8 @@ class BOPVScrapper(BaseScrapper):
         logger = lg.getLogger(self.download_document.__name__)
         logger.info("Scrapping document: %s", url)
         try:
-            response = requests.get(url, timeout=30, headers=self.headers)
+            session = create_retry_session(retries=5)
+            response = session.get(url, headers=self.headers, timeout=10)
             if response.status_code != 200:
                 response.raise_for_status() 
             soup = BeautifulSoup(response.content, "html.parser")

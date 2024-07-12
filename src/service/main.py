@@ -2,13 +2,19 @@ import asyncio
 import logging as lg
 import time
 import uuid
+import os
+import typing as tp
+import ipaddress
 
 import httpx
 from fastapi import FastAPI
 
 from src.initialize import initialize_app, initialize_logging
-from src.utils import timeit
+from src.utils import inject_additional_attributes, timeit
+from langtrace_python_sdk import SendUserFeedback, langtrace
+from langtrace_python_sdk.utils.with_root_span import with_langtrace_root_span
 
+langtrace.init(api_key=os.environ.get('LANGTRACE_API_KEY'))
 initialize_logging()
 
 APP = FastAPI()
@@ -20,6 +26,18 @@ DEFAULT_INPUT_QUERY = (
     "víctimas de violencias sexuales o solo a niñas y mujeres?"
 )
 DEFAULT_COLLECTION_NAME = "justicio"
+
+
+@with_langtrace_root_span()
+async def call_llm_api(span_id, trace_id, model_name: str, messages: tp.List[tp.Dict[str, str]]):
+    response = await INIT_OBJECTS.openai_client.chat.completions.create(
+        model=model_name,
+        messages=messages,
+        temperature=INIT_OBJECTS.config_loader["temperature"],
+        seed=INIT_OBJECTS.config_loader["seed"],
+        max_tokens=INIT_OBJECTS.config_loader["max_tokens"],
+    )
+    return response, span_id, trace_id
 
 
 @APP.get("/healthcheck")
@@ -67,12 +85,26 @@ async def a_request_get(url):
         return response.text
 
 
+@APP.get("/qa_feedback")
+@with_langtrace_root_span("Feedback")
+@timeit
+async def qa_feedback(span_id: str, trace_id: str, user_score: int):
+    data = {
+        "spanId": span_id, "traceId": trace_id, "userScore": user_score, "userId": None
+    }
+    SendUserFeedback().evaluate(data=data)
+    return {"feedback": "OK"}
+
+
 @APP.get("/qa")
+@with_langtrace_root_span("RAG Justicio")
 @timeit
 async def qa(
     input_query: str = DEFAULT_INPUT_QUERY,
     collection_name: str = DEFAULT_COLLECTION_NAME,
     model_name: str = INIT_OBJECTS.config_loader["llm_model_name"],
+    input_original_query: str | None = None,
+    ip_request_client: ipaddress.IPv4Address | None = None,
 ):
     logger = lg.getLogger(qa.__name__)
     logger.info(input_query)
@@ -99,12 +131,13 @@ async def qa(
         {"role": "user", "content": input_query},
     ]
     # logger.info(messages)
-    response = await INIT_OBJECTS.openai_client.chat.completions.create(
-        model=model_name,
-        messages=messages,
-        temperature=INIT_OBJECTS.config_loader["temperature"],
-        seed=INIT_OBJECTS.config_loader["seed"],
-        max_tokens=INIT_OBJECTS.config_loader["max_tokens"],
+    additional_attributes = {
+        "db.collection.name": collection_name,
+        "service.ip": ip_request_client,
+        "llm.original_query": input_original_query
+    }
+    response, span_id, trace_id = await inject_additional_attributes(
+        lambda: call_llm_api(model_name=model_name, messages=messages), additional_attributes
     )
     answer = response.choices[0].message.content
     logger.info(answer)
@@ -114,6 +147,8 @@ async def qa(
         scoring_id=str(uuid.uuid4()),
         context=docs,
         answer=answer,
+        span_id=str(span_id),
+        trace_id=str(trace_id),
     )
     return response_payload
 

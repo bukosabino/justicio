@@ -4,7 +4,8 @@ chunk_overlap: 100
 
 admin_email: bukosabino@gmail.com
 
-embeddings_model_name: intfloat/multilingual-e5-large
+# embeddings_model_name: intfloat/multilingual-e5-large
+embeddings_model_name: BAAI/bge-m3
 embeddings_model_size: 1024
 
 vector_store: 'qdrant'  # {'qdrant', 'pinecone', 'supabase'}
@@ -28,6 +29,7 @@ collections:
   - justicio
   - boe
   - boe-multilingual-e5-large
+  - boe-bge-m3
   - bocm
   - bocm-multilingual-e5-large
   - bopz

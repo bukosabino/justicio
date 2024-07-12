@@ -1,1 +1,1 @@
-COLLECTION_NAME = "bopv-multilingual-e5-large"
+COLLECTION_NAME = "bopv"

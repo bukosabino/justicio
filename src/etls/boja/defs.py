@@ -1,1 +1,1 @@
-COLLECTION_NAME = "boja-multilingual-e5-large"
+COLLECTION_NAME = "boja"

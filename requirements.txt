@@ -27,6 +27,8 @@ sentence_transformers==2.2.2
 openai==1.30.5
 tavily-python==0.3.3
 
+GPUtil==1.4.0
+
 sendgrid==6.10.0
 
 # Clean code tools
@@ -34,4 +36,7 @@ black==23.9.1
 isort==5.12.0
 
 # Evaluation
-# ragas==0.1.0rc1
+groq==0.5.0
+datasets==2.19.1
+ipywidgets==8.1.2
+ragas==0.1.7

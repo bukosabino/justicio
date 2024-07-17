@@ -55,7 +55,7 @@ class BOPVScrapper(BaseScrapper):
     def _get_summary_link_from_date(self, requested_date: date):
         url = self._get_monthly_url(requested_date)
         try:
-            response = requests.get(url, headers=self.headers)
+            response = requests.get(url, timeout=30, headers=self.headers)
             response.raise_for_status()
             html = response.text
             dias_habilitados_pattern = re.compile(r"var diasHabilitados = (\[.*?\]);")

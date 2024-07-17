@@ -1,3 +1,4 @@
+import asyncio
 import logging as lg
 import time
 import typing as tp
@@ -21,17 +22,43 @@ class QAResponsePayloadModel(BaseModel):
 
 def timeit(func):
     @wraps(func)
-    async def wrapper(*args, **kwargs):
-        logger = lg.getLogger(func.__name__)
-        logger.info("<<< Starting  >>>")
+    async def async_wrapper(*args, **kwargs):
+        logger = lg.getLogger(func.__module__)
+        logger.info("<<< Starting >>>")
         start_time = time.time()
-        result = await func(*args, **kwargs)
-        end_time = time.time()
-        delta = end_time - start_time
-        msg = f"{delta:2.2f}s" if delta > 1 else f"{1000 * delta:2.1f}ms"
-        logger.info("<<< Completed >>> in %s", msg)
+        try:
+            result = await func(*args, **kwargs)
+        except Exception as e:
+            logger.error("Exception occurred", exc_info=True)
+            raise
+        finally:
+            end_time = time.time()
+            delta = end_time - start_time
+            msg = f"{delta:2.2f}s" if delta > 1 else f"{1000 * delta:2.1f}ms"
+            logger.info("<<< Completed >>> in %s", msg)
         return result
 
+    @wraps(func)
+    def sync_wrapper(*args, **kwargs):
+        logger = lg.getLogger(func.__module__)
+        logger.info("<<< Starting >>>")
+        start_time = time.time()
+        try:
+            result = func(*args, **kwargs)
+        except Exception as e:
+            logger.error("Exception occurred", exc_info=True)
+            raise
+        finally:
+            end_time = time.time()
+            delta = end_time - start_time
+            msg = f"{delta:2.2f}s" if delta > 1 else f"{1000 * delta:2.1f}ms"
+            logger.info("<<< Completed >>> in %s", msg)
+        return result
+
+    if asyncio.iscoroutinefunction(func):
+        return async_wrapper
+    else:
+        return sync_wrapper
     return wrapper
 
 

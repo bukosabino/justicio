@@ -4,6 +4,20 @@ GET collections
 // Get collection info
 GET collections/justicio
 
+// Create a new collection
+// https://qdrant.tech/documentation/tutorials/bulk-upload/
+PUT /collections/{collection_name}
+{
+    "vectors": {
+      "size": 1024,
+      "distance": "Cosine"
+    },
+    "shard_number": 2,
+    "optimizers_config": {
+        "indexing_threshold": 0
+    }
+}
+
 // List points in a collection, using filter by metadata
 POST collections/justicio/points/scroll
 {
@@ -76,6 +90,22 @@ POST collections/justicio/points/delete
     ]
   }
 }
+
+// No funciona porque tenemos las fechas como strings en lugar de como números.
+POST /collections/boe-bge-m3/points/count
+{
+    "filter": {
+        "should": [
+            {
+                "key": "metadata.anio",
+                "range": {
+                    "gte": 2000
+                }
+            }
+        ]
+    }
+}
+
 
 // https://qdrant.tech/documentation/concepts/filtering/
 // https://qdrant.tech/documentation/concepts/points/
